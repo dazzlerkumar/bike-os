@@ -11,6 +11,7 @@ import {
   Sparkles,
   Zap,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -79,9 +80,14 @@ export default function Home() {
       <header className="sticky top-0 z-20 border-b border-border bg-card/85 backdrop-blur-md pt-[env(safe-area-inset-top,0px)]">
         <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3 sm:max-w-2xl sm:px-6">
           <div className="flex items-center gap-2.5">
-            <span className="flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground font-mono font-bold text-xs shadow-xs">
-              OS
-            </span>
+            <Image
+              src="/bikeos-primary.svg"
+              alt="bikeOS"
+              width={36}
+              height={36}
+              className="size-9 rounded-xl shadow-xs"
+              priority
+            />
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-bold tracking-tight text-foreground text-sm">

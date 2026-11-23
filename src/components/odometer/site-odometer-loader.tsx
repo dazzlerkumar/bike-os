@@ -17,7 +17,7 @@ export function SiteOdometerLoader({
   return (
     <>
       {children}
-      {true && <OdometerLoadingScreen onComplete={handleComplete} />}
+      {showLoader && <OdometerLoadingScreen onComplete={handleComplete} />}
     </>
   );
 }

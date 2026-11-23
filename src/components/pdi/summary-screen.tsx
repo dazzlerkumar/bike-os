@@ -236,12 +236,13 @@ export function SummaryScreen({
           </div>
 
           <div
-            className={`flex size-10 shrink-0 items-center justify-center rounded-xl font-bold ${headlineStatus === "all_clear"
-              ? "bg-glacier-blue text-slate-950 shadow-xs"
-              : headlineStatus === "issues_to_resolve"
-                ? "bg-racing-red text-white shadow-md shadow-racing-red/25"
-                : "bg-muted text-foreground"
-              }`}
+            className={`flex size-10 shrink-0 items-center justify-center rounded-xl font-bold ${
+              headlineStatus === "all_clear"
+                ? "bg-glacier-blue text-slate-950 shadow-xs"
+                : headlineStatus === "issues_to_resolve"
+                  ? "bg-racing-red text-white shadow-md shadow-racing-red/25"
+                  : "bg-muted text-foreground"
+            }`}
           >
             {headlineStatus === "all_clear" && (
               <CheckCircle2 className="size-6" />
@@ -295,10 +296,11 @@ export function SummaryScreen({
           type="button"
           size="lg"
           onClick={handleShareReport}
-          className={`flex-1 font-bold text-xs sm:text-sm py-5 px-4 shadow-sm justify-center gap-1.5 transition-all ${hasIssues
-            ? "bg-racing-red text-white hover:bg-racing-red/90 shadow-racing-red/25"
-            : "bg-glacier-blue text-slate-950 hover:bg-glacier-blue/90 border border-glacier-blue"
-            }`}
+          className={`flex-1 font-bold text-xs sm:text-sm py-5 px-4 shadow-sm justify-center gap-1.5 transition-all ${
+            hasIssues
+              ? "bg-racing-red text-white hover:bg-racing-red/90 shadow-racing-red/25"
+              : "bg-glacier-blue text-slate-950 hover:bg-glacier-blue/90 border border-glacier-blue"
+          }`}
         >
           {copied ? (
             <Check className="size-4" />
@@ -329,91 +331,91 @@ export function SummaryScreen({
         odoAnswer ||
         frontTyrePressure ||
         rearTyrePressure) && (
-          <div className="rounded-xl border border-border bg-card p-4 flex flex-col gap-3 shadow-2xs">
-            <div className="flex items-center justify-between border-b border-border/60 pb-2">
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Baseline Vehicle Identity &amp; Readings
-              </span>
-              <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold text-sky-950 dark:text-sky-200 bg-glacier-blue/20 border border-glacier-blue/40 px-2 py-0.5 rounded-full">
-                <ShieldCheck className="size-3 text-glacier-blue" />
-                Day 1 Baseline
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-              {chassisAnswer && (
-                <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
-                  <span className="text-muted-foreground text-[10px] font-mono">
-                    CHASSIS VIN STAMPING
-                  </span>
-                  <span className="font-mono font-bold text-foreground break-all pt-0.5">
-                    {chassisAnswer}
-                  </span>
-                </div>
-              )}
-              {engineAnswer && (
-                <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
-                  <span className="text-muted-foreground text-[10px] font-mono">
-                    ENGINE NUMBER
-                  </span>
-                  <span className="font-mono font-bold text-foreground break-all pt-0.5">
-                    {engineAnswer}
-                  </span>
-                </div>
-              )}
-              {odoAnswer && (
-                <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
-                  <span className="text-muted-foreground text-[10px] font-mono">
-                    DELIVERY ODOMETER
-                  </span>
-                  <span className="font-mono font-bold text-foreground pt-0.5">
-                    {odoAnswer} km
-                  </span>
-                </div>
-              )}
-              {frontTyrePressure && (
-                <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
-                  <span className="text-muted-foreground text-[10px] font-mono">
-                    FRONT TYRE PRESSURE
-                  </span>
-                  <span className="font-mono font-bold text-foreground pt-0.5">
-                    {frontTyrePressure} psi
-                  </span>
-                </div>
-              )}
-              {rearTyrePressure && (
-                <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
-                  <span className="text-muted-foreground text-[10px] font-mono">
-                    REAR TYRE PRESSURE
-                  </span>
-                  <span className="font-mono font-bold text-foreground pt-0.5">
-                    {rearTyrePressure} psi
-                  </span>
-                </div>
-              )}
-              {oilLevelAnswer && (
-                <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
-                  <span className="text-muted-foreground text-[10px] font-mono">
-                    ENGINE OIL SIGHT GLASS
-                  </span>
-                  <span className="font-mono font-bold text-foreground pt-0.5">
-                    {oilLevelAnswer}
-                  </span>
-                </div>
-              )}
-              {freeServiceAnswer && (
-                <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
-                  <span className="text-muted-foreground text-[10px] font-mono">
-                    1ST FREE SERVICE
-                  </span>
-                  <span className="font-mono font-bold text-foreground pt-0.5">
-                    {freeServiceAnswer}
-                  </span>
-                </div>
-              )}
-            </div>
+        <div className="rounded-xl border border-border bg-card p-4 flex flex-col gap-3 shadow-2xs">
+          <div className="flex items-center justify-between border-b border-border/60 pb-2">
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Baseline Vehicle Identity &amp; Readings
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold text-sky-950 dark:text-sky-200 bg-glacier-blue/20 border border-glacier-blue/40 px-2 py-0.5 rounded-full">
+              <ShieldCheck className="size-3 text-glacier-blue" />
+              Day 1 Baseline
+            </span>
           </div>
-        )}
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+            {chassisAnswer && (
+              <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
+                <span className="text-muted-foreground text-[10px] font-mono">
+                  CHASSIS VIN STAMPING
+                </span>
+                <span className="font-mono font-bold text-foreground break-all pt-0.5">
+                  {chassisAnswer}
+                </span>
+              </div>
+            )}
+            {engineAnswer && (
+              <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
+                <span className="text-muted-foreground text-[10px] font-mono">
+                  ENGINE NUMBER
+                </span>
+                <span className="font-mono font-bold text-foreground break-all pt-0.5">
+                  {engineAnswer}
+                </span>
+              </div>
+            )}
+            {odoAnswer && (
+              <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
+                <span className="text-muted-foreground text-[10px] font-mono">
+                  DELIVERY ODOMETER
+                </span>
+                <span className="font-mono font-bold text-foreground pt-0.5">
+                  {odoAnswer} km
+                </span>
+              </div>
+            )}
+            {frontTyrePressure && (
+              <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
+                <span className="text-muted-foreground text-[10px] font-mono">
+                  FRONT TYRE PRESSURE
+                </span>
+                <span className="font-mono font-bold text-foreground pt-0.5">
+                  {frontTyrePressure} psi
+                </span>
+              </div>
+            )}
+            {rearTyrePressure && (
+              <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
+                <span className="text-muted-foreground text-[10px] font-mono">
+                  REAR TYRE PRESSURE
+                </span>
+                <span className="font-mono font-bold text-foreground pt-0.5">
+                  {rearTyrePressure} psi
+                </span>
+              </div>
+            )}
+            {oilLevelAnswer && (
+              <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
+                <span className="text-muted-foreground text-[10px] font-mono">
+                  ENGINE OIL SIGHT GLASS
+                </span>
+                <span className="font-mono font-bold text-foreground pt-0.5">
+                  {oilLevelAnswer}
+                </span>
+              </div>
+            )}
+            {freeServiceAnswer && (
+              <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
+                <span className="text-muted-foreground text-[10px] font-mono">
+                  1ST FREE SERVICE
+                </span>
+                <span className="font-mono font-bold text-foreground pt-0.5">
+                  {freeServiceAnswer}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {hasIssues && (
         <div className="flex flex-col gap-3">
@@ -656,12 +658,13 @@ function IssueSummaryCard({
 
   return (
     <div
-      className={`rounded-xl border p-3.5 flex flex-col gap-2.5 shadow-2xs bg-card ${isFixBefore
-        ? "border-l-4 border-l-racing-red border-racing-red/40"
-        : isWriting
-          ? "border-l-4 border-l-glacier-blue border-glacier-blue/40"
-          : "border-border"
-        }`}
+      className={`rounded-xl border p-3.5 flex flex-col gap-2.5 shadow-2xs bg-card ${
+        isFixBefore
+          ? "border-l-4 border-l-racing-red border-racing-red/40"
+          : isWriting
+            ? "border-l-4 border-l-glacier-blue border-glacier-blue/40"
+            : "border-border"
+      }`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -669,12 +672,13 @@ function IssueSummaryCard({
             {item.label}
           </span>
           <span
-            className={`rounded-full px-2 py-0.2 font-mono text-[10px] font-bold ${isFixBefore
-              ? "bg-racing-red/15 text-racing-red border border-racing-red/30"
-              : isWriting
-                ? "bg-glacier-blue/20 text-sky-950 dark:text-sky-200 border border-glacier-blue/40"
-                : "bg-muted text-muted-foreground border border-border"
-              }`}
+            className={`rounded-full px-2 py-0.2 font-mono text-[10px] font-bold ${
+              isFixBefore
+                ? "bg-racing-red/15 text-racing-red border border-racing-red/30"
+                : isWriting
+                  ? "bg-glacier-blue/20 text-sky-950 dark:text-sky-200 border border-glacier-blue/40"
+                  : "bg-muted text-muted-foreground border border-border"
+            }`}
           >
             {severityLabel}
           </span>

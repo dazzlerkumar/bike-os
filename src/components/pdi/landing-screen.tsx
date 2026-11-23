@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Check, Copy, Lock, Smartphone } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { type InspectionRecord, PDI_ZONES } from "@/lib/pdi-data";
@@ -45,8 +46,14 @@ export function LandingScreen({
       />
       <div className="mx-auto flex w-full max-w-xl flex-col px-5 pb-16 pt-5 sm:pt-8">
         <header className="flex justify-end">
-          <span className="inline-flex items-center gap-1.5 font-bold tracking-tight text-foreground">
-            <span className="size-2 rounded-full bg-racing-red" />
+          <span className="inline-flex items-center gap-2 font-bold tracking-tight text-foreground">
+            <Image
+              src="/bikeos-primary.svg"
+              alt="bikeOS"
+              width={20}
+              height={20}
+              className="size-5 rounded-md"
+            />
             bikeOS
           </span>
         </header>

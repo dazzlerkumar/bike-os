@@ -223,7 +223,6 @@ export function OdometerLoadingScreen({
                   strokeWidth="0.5"
                 />
               </g>
-
             </svg>
             <div className="flex items-center gap-2 mt-20">
               <span className="font-extrabold text-2xl tracking-tight text-slate-900 font-sans">
@@ -232,8 +231,6 @@ export function OdometerLoadingScreen({
             </div>
           </div>
         </div>
-
-
       </div>
     </div>
   );
