@@ -2,6 +2,7 @@
 
 import {
   ArrowLeft,
+  Check,
   ChevronRight,
   Eye,
   EyeOff,
@@ -35,7 +36,6 @@ import { ZoneAccordion } from "./zone-accordion";
 
 interface PdiClientProps {
   zones?: ZoneDef[];
-  guideContent?: React.ReactNode;
 }
 
 type Stage = "landing" | "setup" | "checklist" | "summary";
@@ -43,7 +43,7 @@ type Stage = "landing" | "setup" | "checklist" | "summary";
 const PREPARE_DISMISSED_KEY = "bikeos_pdi_prepare_dismissed";
 const SHOW_HINTS_KEY = "bikeos_pdi_show_hints";
 
-export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
+export function PdiClient({ zones = PDI_ZONES }: PdiClientProps) {
   const [stage, setStage] = useState<Stage>("landing");
   const [inspection, setInspection] = useState<InspectionRecord | null>(null);
   const [activeZoneId, setActiveZoneId] = useState<string>("paperwork");
@@ -52,7 +52,6 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [, startTransition] = useTransition();
 
-  // Load active inspection and settings on mount
   useEffect(() => {
     async function loadInitial() {
       if (typeof window === "undefined") return;
@@ -86,7 +85,6 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
     loadInitial();
   }, []);
 
-  // Compute visible items and answered counts
   const currentSetup: BikeSetup = inspection?.setup || {
     drive: "all",
     brakes: "all",
@@ -122,7 +120,14 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
       ? Math.round((issueCount / totalVisibleCount) * 100)
       : 0;
 
-  // Actions
+  const activeZone = zones.find((z) => z.id === activeZoneId) || zones[0];
+  const activeZoneItems = activeZone.items.filter((i) =>
+    itemAppliesToSetup(i, currentSetup),
+  );
+  const activeRemainingCount = activeZoneItems.filter(
+    (i) => !answers[i.id]?.state || answers[i.id]?.state === "unanswered",
+  ).length;
+
   const handleStartFresh = async () => {
     const newRecord = await createNewInspection("New Motorcycle");
     setInspection(newRecord);
@@ -171,6 +176,28 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
         photos: [],
         updatedAt: Date.now(),
       };
+    }
+    const updated: InspectionRecord = { ...inspection, answers: nextAnswers };
+    setInspection(updated);
+    saveInspection(updated);
+  };
+
+  const handleMarkRemainingAsOk = (items: ChecklistItemDef[]) => {
+    if (!inspection) return;
+    const nextAnswers = { ...inspection.answers };
+    for (const item of items) {
+      if (
+        !nextAnswers[item.id]?.state ||
+        nextAnswers[item.id]?.state === "unanswered"
+      ) {
+        nextAnswers[item.id] = {
+          state: "ok",
+          value: "",
+          note: "",
+          photos: [],
+          updatedAt: Date.now(),
+        };
+      }
     }
     const updated: InspectionRecord = { ...inspection, answers: nextAnswers };
     setInspection(updated);
@@ -235,7 +262,6 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
         onStart={handleStartFresh}
         onContinue={handleContinueExisting}
         onResetAndStartNew={handleStartFresh}
-        referenceGuide={guideContent}
       />
     );
   }
@@ -264,11 +290,9 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
     );
   }
 
-  // Stage: "checklist"
   return (
     <div className="flex flex-col min-h-dvh pb-28">
-      {/* Sticky Top Header */}
-      <header className="sticky top-0 z-20 border-b border-border bg-card/90 backdrop-blur-md pt-[env(safe-area-inset-top,0px)]">
+      <header className="sticky top-0 z-20 border-b border-border bg-card/95 backdrop-blur-md pt-[env(safe-area-inset-top,0px)] shadow-2xs">
         <div className="mx-auto flex max-w-xl items-center justify-between px-4 py-2.5">
           <button
             type="button"
@@ -276,80 +300,89 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
             className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground font-medium"
           >
             <ArrowLeft className="size-4" />
-            <span className="hidden sm:inline">Landing</span>
+            <span className="hidden sm:inline">Exit</span>
           </button>
 
           <div className="flex flex-col items-center">
-            <span className="font-bold text-xs sm:text-sm text-foreground tracking-tight">
-              {inspection?.bikeModel || "PDI Inspection"}
-            </span>
-            <span className="font-mono text-[11px] text-muted-foreground">
-              {answeredCount} of {totalVisibleCount} checked
-              {issueCount > 0 && ` • ${issueCount} issues`}
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="size-1.5 rounded-full bg-racing-red" />
+              <span className="font-bold text-xs sm:text-sm text-foreground tracking-tight">
+                {inspection?.bikeModel || "PDI Inspection"}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 font-mono text-[11px] mt-0.5">
+              <span className="text-sky-950 dark:text-sky-200 bg-glacier-blue/20 border border-glacier-blue/40 px-1.5 py-0.2 rounded font-bold">
+                {answeredCount}/{totalVisibleCount} checked
+              </span>
+              {issueCount > 0 && (
+                <span className="text-racing-red bg-racing-red/15 border border-racing-red/30 px-1.5 py-0.2 rounded font-bold">
+                  {issueCount} {issueCount === 1 ? "issue" : "issues"}
+                </span>
+              )}
+            </div>
           </div>
 
-          <div className="relative">
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="flex size-9 items-center justify-center rounded-lg border border-border bg-card text-foreground hover:bg-muted"
-              title="Options"
+              onClick={handleToggleHints}
+              className={`flex size-9 items-center justify-center rounded-lg border transition-colors ${
+                showHints
+                  ? "border-glacier-blue bg-glacier-blue/20 text-sky-950 dark:text-sky-200"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground"
+              }`}
+              title={showHints ? "Hide hints" : "Expand all hints"}
             >
-              <MoreVertical className="size-4" />
+              {showHints ? (
+                <Eye className="size-4" />
+              ) : (
+                <EyeOff className="size-4" />
+              )}
             </button>
 
-            {menuOpen && (
-              <div className="absolute right-0 top-11 z-30 w-52 rounded-xl border border-border bg-popover p-1.5 shadow-lg text-xs">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    setStage("setup");
-                  }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg hover:bg-muted font-medium text-foreground"
-                >
-                  <Settings2 className="size-4 text-muted-foreground" />
-                  <span>Configure Bike Filters</span>
-                </button>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="flex size-9 items-center justify-center rounded-lg border border-border bg-card text-foreground hover:bg-muted"
+                title="Options"
+              >
+                <MoreVertical className="size-4" />
+              </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    handleToggleHints();
-                  }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg hover:bg-muted font-medium text-foreground"
-                >
-                  {showHints ? (
-                    <EyeOff className="size-4 text-muted-foreground" />
-                  ) : (
-                    <Eye className="size-4 text-muted-foreground" />
-                  )}
-                  <span>
-                    {showHints ? "Hide all hints" : "Expand all hints"}
-                  </span>
-                </button>
+              {menuOpen && (
+                <div className="absolute right-0 top-11 z-30 w-52 rounded-xl border border-border bg-popover p-1.5 shadow-lg text-xs">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setStage("setup");
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg hover:bg-muted font-medium text-foreground"
+                  >
+                    <Settings2 className="size-4 text-muted-foreground" />
+                    <span>Configure Bike Filters</span>
+                  </button>
 
-                <div className="my-1 border-t border-border" />
+                  <div className="my-1 border-t border-border" />
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    handleStartFresh();
-                  }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg hover:bg-muted text-racing-red font-medium"
-                >
-                  <span>Start new inspection</span>
-                </button>
-              </div>
-            )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      handleStartFresh();
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg hover:bg-muted text-racing-red font-medium"
+                  >
+                    <span>Start new inspection</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Progress Bar with Issue Segment */}
-        <div className="h-1.5 w-full bg-muted overflow-hidden flex">
+        <div className="h-2 w-full bg-muted/80 overflow-hidden flex">
           <div
             className="h-full bg-glacier-blue transition-all duration-300"
             style={{ width: `${Math.max(0, progressPercent - issuePercent)}%` }}
@@ -359,9 +392,66 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
             style={{ width: `${issuePercent}%` }}
           />
         </div>
+
+        <div className="border-t border-border/80 bg-card/80 backdrop-blur-sm px-4 py-2 overflow-x-auto no-scrollbar">
+          <div className="mx-auto flex max-w-xl items-center gap-1.5 min-w-max">
+            {zones.map((zone) => {
+              const zItems = zone.items.filter((i) =>
+                itemAppliesToSetup(i, currentSetup),
+              );
+              const zAnswered = zItems.filter(
+                (i) =>
+                  answers[i.id]?.state && answers[i.id]?.state !== "unanswered",
+              ).length;
+              const zIssues = zItems.filter(
+                (i) => answers[i.id]?.state === "issue",
+              ).length;
+              const zComplete =
+                zAnswered === zItems.length && zItems.length > 0;
+              const isActive = activeZoneId === zone.id;
+
+              return (
+                <button
+                  key={zone.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveZoneId(zone.id);
+                    const el = document.getElementById(`zone-${zone.id}`);
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition-all select-none ${
+                    isActive
+                      ? "border border-glacier-blue bg-glacier-blue/20 text-sky-950 dark:text-sky-200 font-bold shadow-2xs"
+                      : zComplete
+                        ? zIssues > 0
+                          ? "border border-racing-red/40 bg-racing-red/10 text-racing-red font-semibold"
+                          : "border border-glacier-blue/40 bg-glacier-blue/10 text-sky-950 dark:text-sky-200"
+                        : "border border-border/80 bg-card text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <span>
+                    {zone.order}. {zone.shortTitle}
+                  </span>
+                  {zComplete ? (
+                    zIssues > 0 ? (
+                      <span className="size-1.5 rounded-full bg-racing-red" />
+                    ) : (
+                      <Check className="size-3 text-glacier-blue stroke-[3]" />
+                    )
+                  ) : zAnswered > 0 ? (
+                    <span className="text-[10px] text-muted-foreground font-sans">
+                      {zAnswered}/{zItems.length}
+                    </span>
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </header>
 
-      {/* Main Checklist Body */}
       <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 px-4 pt-4">
         {showPrepareCard && <PrepareCard onDismiss={handleDismissPrepare} />}
 
@@ -381,12 +471,12 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
               onMarkZoneAsNa={
                 zone.id === "test-ride" ? handleMarkZoneAsNa : undefined
               }
+              onMarkRemainingAsOk={handleMarkRemainingAsOk}
             />
           ))}
         </div>
       </main>
 
-      {/* Sticky Bottom Bar */}
       <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-card/95 backdrop-blur-lg pb-[env(safe-area-inset-bottom,0px)] shadow-lg">
         <div className="mx-auto flex max-w-xl items-center justify-between gap-3 px-4 py-2.5">
           <Button
@@ -394,7 +484,7 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
             variant="outline"
             size="default"
             onClick={() => setStage("summary")}
-            className="min-h-11 font-medium text-xs px-3.5 relative"
+            className="min-h-11 font-medium text-xs px-4 relative border-border/80 hover:bg-muted"
           >
             <span>Summary</span>
             {issueCount > 0 && (
@@ -404,17 +494,28 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
 
           <Button
             type="button"
-            variant="default"
             size="default"
             onClick={handleNextUnchecked}
-            className="min-h-11 flex-1 bg-foreground text-background font-semibold text-xs shadow-sm justify-center gap-1.5"
+            className={`min-h-11 flex-1 font-bold text-xs shadow-sm justify-center gap-1.5 transition-all group ${
+              answeredCount === totalVisibleCount
+                ? "bg-racing-red text-white hover:bg-racing-red/90 shadow-md shadow-racing-red/25"
+                : "bg-foreground text-background hover:bg-foreground/90"
+            }`}
           >
             <span>
               {answeredCount === totalVisibleCount
-                ? "Review Summary"
-                : "Next Unchecked"}
+                ? `Review Summary (${issueCount} ${issueCount === 1 ? "issue" : "issues"})`
+                : activeRemainingCount > 0
+                  ? `Next Check (${activeRemainingCount} left in zone)`
+                  : "Next Unchecked"}
             </span>
-            <ChevronRight className="size-4" />
+            <ChevronRight
+              className={`size-4 transition-transform group-hover:translate-x-0.5 ${
+                answeredCount === totalVisibleCount
+                  ? "text-white"
+                  : "text-racing-red"
+              }`}
+            />
           </Button>
         </div>
       </footer>
