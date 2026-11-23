@@ -1,11 +1,17 @@
+"use client";
+
 import {
+  AlertTriangle,
   BatteryCharging,
+  CheckCircle2,
+  ChevronRight,
+  FileCheck2,
   Gauge,
-  Navigation,
-  ShieldAlert,
+  HelpCircle,
   Sparkles,
   Zap,
 } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,259 +22,413 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+type ItemStatus = "idle" | "ok" | "issue" | "na";
+
+interface CheckItem {
+  id: string;
+  title: string;
+  detail: string;
+  status: ItemStatus;
+}
+
 export default function Home() {
+  const [activeZone, setActiveZone] = useState("walkaround");
+  const [checklist, setChecklist] = useState<CheckItem[]>([
+    {
+      id: "chassis-vin",
+      title: "Chassis & VIN Match",
+      detail: "Match VIN stamped on headstock with invoice & insurance paper.",
+      status: "ok",
+    },
+    {
+      id: "tyres-alloys",
+      title: "Tyre DOT & Wheel Finish",
+      detail:
+        "Check manufacturing date on sidewall and inspect rims for scuffs.",
+      status: "idle",
+    },
+    {
+      id: "front-disc",
+      title: "Front Brake Calliper & Fluid",
+      detail: "Reservoir level at max window, no weeping around banjo bolt.",
+      status: "idle",
+    },
+    {
+      id: "screen-hud",
+      title: "Display & Console Startup",
+      detail: "Clean boot without error codes, odometer reading under 10 km.",
+      status: "issue",
+    },
+  ]);
+
+  const updateStatus = (id: string, status: ItemStatus) => {
+    setChecklist((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? { ...item, status: item.status === status ? "idle" : status }
+          : item,
+      ),
+    );
+  };
+
+  const completedCount = checklist.filter((i) => i.status !== "idle").length;
+
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <header className="sticky top-0 z-10 border-b border-border bg-card/75 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground font-mono font-bold text-sm shadow-xs">
+    <div className="flex min-h-dvh flex-col bg-background text-foreground pb-24 sm:pb-12">
+      <header className="sticky top-0 z-20 border-b border-border bg-card/85 backdrop-blur-md pt-[env(safe-area-inset-top,0px)]">
+        <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3 sm:max-w-2xl sm:px-6">
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground font-mono font-bold text-xs shadow-xs">
               OS
             </span>
             <div>
-              <p className="font-semibold tracking-tight text-foreground text-sm">
-                BikeOS
-              </p>
-              <p className="text-muted-foreground text-xs font-mono">
-                Design Tokens System
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold tracking-tight text-foreground text-sm">
+                  bikeOS
+                </span>
+                <Badge
+                  variant="outline"
+                  className="border-border bg-polar-white text-[10px] font-mono px-1.5 py-0"
+                >
+                  Light
+                </Badge>
+              </div>
+              <p className="text-[11px] font-mono text-muted-foreground">
+                VIN • 26K-EV94
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <Badge
-              variant="outline"
-              className="border-border bg-polar-white gap-1.5 font-mono text-xs"
-            >
-              <span className="size-2 rounded-full bg-accent animate-pulse" />
-              Light Mode Default
-            </Badge>
-            <Button
-              variant="default"
-              size="sm"
-              className="border border-border/80 shadow-xs"
-            >
-              Primary
-            </Button>
-            <Button variant="secondary" size="sm">
-              Glacier Action
-            </Button>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-polar-white px-2.5 py-1 text-[11px] font-mono text-foreground shadow-2xs">
+              <span className="size-1.5 rounded-full bg-accent animate-pulse" />
+              Connected
+            </span>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-6 py-10">
-        <section className="flex flex-col gap-2">
-          <p className="text-xs uppercase font-mono tracking-widest text-muted-foreground">
-            Design Tokens • OKLCH
-          </p>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Color System & UI Tokens
-          </h1>
-          <p className="text-muted-foreground text-sm max-w-2xl">
-            Light-first design foundation built with shadcn and perceptually
-            uniform OKLCH color coordinates.
-          </p>
+      <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-5 px-4 pt-4 sm:max-w-2xl sm:px-6 sm:pt-6">
+        <section className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3">
+          <Card className="border-border bg-card p-3 shadow-2xs">
+            <CardContent className="p-0 flex flex-col gap-1">
+              <div className="flex items-center justify-between text-muted-foreground text-[11px]">
+                <span>SPEED</span>
+                <Gauge className="size-3.5 text-glacier-blue" />
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="font-mono text-2xl font-extrabold text-foreground tracking-tight sm:text-3xl">
+                  42
+                </span>
+                <span className="font-mono text-[10px] text-muted-foreground">
+                  KM/H
+                </span>
+              </div>
+              <div className="h-1 w-full rounded-full bg-muted overflow-hidden mt-0.5">
+                <div
+                  className="h-full bg-accent rounded-full"
+                  style={{ width: "55%" }}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border bg-card p-3 shadow-2xs">
+            <CardContent className="p-0 flex flex-col gap-1">
+              <div className="flex items-center justify-between text-muted-foreground text-[11px]">
+                <span>BATTERY</span>
+                <BatteryCharging className="size-3.5 text-glacier-blue" />
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="font-mono text-2xl font-extrabold text-foreground tracking-tight sm:text-3xl">
+                  87
+                </span>
+                <span className="font-mono text-[10px] text-muted-foreground">
+                  %
+                </span>
+              </div>
+              <div className="h-1 w-full rounded-full bg-muted overflow-hidden mt-0.5">
+                <div
+                  className="h-full bg-glacier-blue rounded-full"
+                  style={{ width: "87%" }}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border bg-card p-3 shadow-2xs">
+            <CardContent className="p-0 flex flex-col gap-1">
+              <div className="flex items-center justify-between text-muted-foreground text-[11px]">
+                <span>DRIVE</span>
+                <Zap className="size-3.5 text-accent" />
+              </div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-mono text-xl font-bold text-foreground sm:text-2xl">
+                  SPORT
+                </span>
+              </div>
+              <p className="text-[10px] text-muted-foreground truncate">
+                Throttle map 1:1
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border bg-card p-3 shadow-2xs">
+            <CardContent className="p-0 flex flex-col gap-1">
+              <div className="flex items-center justify-between text-muted-foreground text-[11px]">
+                <span>INSPECTION</span>
+                <FileCheck2 className="size-3.5 text-glacier-blue" />
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="font-mono text-2xl font-extrabold text-foreground sm:text-3xl">
+                  {completedCount}/{checklist.length}
+                </span>
+              </div>
+              <p className="text-[10px] text-muted-foreground truncate">
+                Showroom PDI
+              </p>
+            </CardContent>
+          </Card>
         </section>
 
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="border-border bg-card shadow-xs">
-            <CardHeader>
-              <div className="h-28 rounded-lg bg-polar-white border border-border flex items-end p-4 shadow-inner">
-                <span className="font-mono text-xs font-bold text-foreground bg-white/90 backdrop-blur-xs px-2 py-0.5 rounded border border-border/60">
+        <section className="flex flex-col gap-2.5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-bold text-base tracking-tight text-foreground">
+                Walk-around Inspection
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Tap items standing at the vehicle. Big touch targets.
+              </p>
+            </div>
+            <Badge
+              variant="outline"
+              className="font-mono text-[11px] border-border bg-polar-white"
+            >
+              Zone 2 of 5
+            </Badge>
+          </div>
+
+          <div className="flex gap-1.5 overflow-x-auto pb-1 pt-0.5 no-scrollbar text-xs">
+            {[
+              { id: "paperwork", label: "Paperwork" },
+              { id: "walkaround", label: "Front & Tyres" },
+              { id: "controls", label: "Controls" },
+              { id: "powertrain", label: "Battery" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveZone(tab.id)}
+                className={`min-h-9 shrink-0 rounded-full px-3.5 text-xs font-medium transition-all ${
+                  activeZone === tab.id
+                    ? "bg-foreground text-background shadow-xs"
+                    : "bg-card border border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-2.5">
+            {checklist.map((item) => {
+              const isOk = item.status === "ok";
+              const isIssue = item.status === "issue";
+              const isNa = item.status === "na";
+
+              return (
+                <div
+                  key={item.id}
+                  className={`flex flex-col gap-2 rounded-xl border p-3.5 transition-all shadow-2xs ${
+                    isIssue
+                      ? "border-accent/40 bg-accent/[0.04]"
+                      : isOk
+                        ? "border-glacier-blue/60 bg-glacier-blue/[0.08]"
+                        : "border-border bg-card"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-semibold text-sm leading-snug text-foreground">
+                        {item.title}
+                      </span>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        {item.detail}
+                      </p>
+                    </div>
+
+                    {isIssue && (
+                      <span className="shrink-0 rounded bg-accent/15 px-2 py-0.5 font-mono text-[10px] font-bold text-accent">
+                        ISSUE
+                      </span>
+                    )}
+                    {isOk && (
+                      <span className="shrink-0 rounded bg-glacier-blue/25 px-2 py-0.5 font-mono text-[10px] font-bold text-slate-800">
+                        VERIFIED
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 pt-1">
+                    <Button
+                      type="button"
+                      variant={isOk ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => updateStatus(item.id, "ok")}
+                      className={`min-h-11 font-medium text-xs ${
+                        isOk
+                          ? "bg-glacier-blue text-slate-950 border-glacier-blue shadow-xs font-bold"
+                          : "border-border hover:bg-muted"
+                      }`}
+                    >
+                      <CheckCircle2 className="size-4" />
+                      OK
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant={isIssue ? "destructive" : "outline"}
+                      size="sm"
+                      onClick={() => updateStatus(item.id, "issue")}
+                      className={`min-h-11 font-medium text-xs ${
+                        isIssue
+                          ? "bg-accent text-accent-foreground shadow-xs font-bold"
+                          : "border-border hover:bg-muted text-accent"
+                      }`}
+                    >
+                      <AlertTriangle className="size-4" />
+                      Issue
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant={isNa ? "secondary" : "outline"}
+                      size="sm"
+                      onClick={() => updateStatus(item.id, "na")}
+                      className={`min-h-11 font-medium text-xs ${
+                        isNa
+                          ? "bg-muted text-foreground font-bold"
+                          : "border-border hover:bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      <HelpCircle className="size-4" />
+                      N/A
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-2.5">
+          <h2 className="font-bold text-base tracking-tight text-foreground">
+            Design Tokens (OKLCH)
+          </h2>
+
+          <div className="grid grid-cols-3 gap-2.5">
+            <div className="flex flex-col gap-1 rounded-xl border border-border bg-card p-2.5 shadow-2xs">
+              <div className="h-14 rounded-lg bg-polar-white border border-border/80 flex items-end p-1.5 shadow-inner">
+                <span className="font-mono text-[9px] font-bold text-foreground">
                   #f1f3f4
                 </span>
               </div>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2 pt-0">
-              <div className="flex items-center justify-between">
-                <CardTitle>Polar White</CardTitle>
-                <Badge variant="outline" className="font-mono text-[10px]">
-                  Primary
-                </Badge>
-              </div>
-              <CardDescription>
-                Clean light foundation, crisp surfaces, neutral backdrop.
-              </CardDescription>
-              <code className="font-mono text-[11px] text-muted-foreground/80 mt-1">
-                oklch(0.963 0.003 228.8)
-              </code>
-            </CardContent>
-          </Card>
+              <p className="font-semibold text-xs text-foreground truncate mt-0.5">
+                Polar White
+              </p>
+              <p className="font-mono text-[9px] text-muted-foreground truncate">
+                Primary
+              </p>
+            </div>
 
-          <Card className="border-border bg-card shadow-xs">
-            <CardHeader>
-              <div className="h-28 rounded-lg bg-glacier-blue border border-glacier-blue/60 flex items-end p-4 shadow-inner">
-                <span className="font-mono text-xs font-bold text-slate-900 bg-white/90 backdrop-blur-xs px-2 py-0.5 rounded border border-white/60">
+            <div className="flex flex-col gap-1 rounded-xl border border-border bg-card p-2.5 shadow-2xs">
+              <div className="h-14 rounded-lg bg-glacier-blue border border-glacier-blue/60 flex items-end p-1.5 shadow-inner">
+                <span className="font-mono text-[9px] font-bold text-slate-900">
                   #9cc6e0
                 </span>
               </div>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2 pt-0">
-              <div className="flex items-center justify-between">
-                <CardTitle>Glacier Blue</CardTitle>
-                <Badge variant="secondary" className="font-mono text-[10px]">
-                  Secondary
-                </Badge>
-              </div>
-              <CardDescription>
-                Ambient indicators, telemetry badges, active focus states.
-              </CardDescription>
-              <code className="font-mono text-[11px] text-muted-foreground/80 mt-1">
-                oklch(0.805 0.058 235.6)
-              </code>
-            </CardContent>
-          </Card>
+              <p className="font-semibold text-xs text-foreground truncate mt-0.5">
+                Glacier Blue
+              </p>
+              <p className="font-mono text-[9px] text-muted-foreground truncate">
+                Secondary
+              </p>
+            </div>
 
-          <Card className="border-border bg-card shadow-xs">
-            <CardHeader>
-              <div className="h-28 rounded-lg bg-racing-red flex items-end p-4 shadow-inner">
-                <span className="font-mono text-xs font-bold text-white bg-black/40 backdrop-blur-xs px-2 py-0.5 rounded border border-white/20">
+            <div className="flex flex-col gap-1 rounded-xl border border-border bg-card p-2.5 shadow-2xs">
+              <div className="h-14 rounded-lg bg-racing-red flex items-end p-1.5 shadow-inner">
+                <span className="font-mono text-[9px] font-bold text-white">
                   #e4002B
                 </span>
               </div>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2 pt-0">
-              <div className="flex items-center justify-between">
-                <CardTitle>Racing Red</CardTitle>
-                <Badge className="bg-accent text-accent-foreground font-mono text-[10px]">
-                  Accent
-                </Badge>
-              </div>
-              <CardDescription>
-                High-visibility highlights, sport telemetry, alerts.
+              <p className="font-semibold text-xs text-foreground truncate mt-0.5">
+                Racing Red
+              </p>
+              <p className="font-mono text-[9px] text-muted-foreground truncate">
+                Accent
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-2.5 pb-2">
+          <Card className="border-border bg-card shadow-2xs">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Component Variants</CardTitle>
+              <CardDescription className="text-xs">
+                Light theme button touch targets with 44px+ height on mobile.
               </CardDescription>
-              <code className="font-mono text-[11px] text-muted-foreground/80 mt-1">
-                oklch(0.579 0.234 23.9)
-              </code>
-            </CardContent>
-          </Card>
-        </section>
-
-        <section className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold tracking-tight text-foreground">
-              Cockpit Telemetry Preview
-            </h2>
-            <span className="font-mono text-xs text-muted-foreground">
-              CAN-BUS: ACTIVE
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="border-border bg-card shadow-xs">
-              <CardContent className="flex flex-col gap-2 pt-4">
-                <div className="flex items-center justify-between text-muted-foreground text-xs">
-                  <span>VELOCITY</span>
-                  <Gauge className="size-4 text-glacier-blue" />
-                </div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-extrabold tracking-tight font-mono text-foreground">
-                    42
-                  </span>
-                  <span className="text-xs font-mono text-muted-foreground">
-                    KM/H
-                  </span>
-                </div>
-                <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full bg-accent rounded-full"
-                    style={{ width: "55%" }}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border bg-card shadow-xs">
-              <CardContent className="flex flex-col gap-2 pt-4">
-                <div className="flex items-center justify-between text-muted-foreground text-xs">
-                  <span>BATTERY</span>
-                  <BatteryCharging className="size-4 text-emerald-600" />
-                </div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-extrabold tracking-tight font-mono text-foreground">
-                    87
-                  </span>
-                  <span className="text-xs font-mono text-muted-foreground">
-                    %
-                  </span>
-                </div>
-                <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full bg-glacier-blue rounded-full"
-                    style={{ width: "87%" }}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border bg-card shadow-xs">
-              <CardContent className="flex flex-col gap-2 pt-4">
-                <div className="flex items-center justify-between text-muted-foreground text-xs">
-                  <span>MODE</span>
-                  <Zap className="size-4 text-accent" />
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-bold tracking-tight text-foreground font-mono">
-                    SPORT
-                  </span>
-                  <Badge className="bg-accent text-accent-foreground font-mono text-[10px]">
-                    RACE
-                  </Badge>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Throttle map calibrated
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border bg-card shadow-xs">
-              <CardContent className="flex flex-col gap-2 pt-4">
-                <div className="flex items-center justify-between text-muted-foreground text-xs">
-                  <span>ROUTE</span>
-                  <Navigation className="size-4 text-glacier-blue" />
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-bold tracking-tight text-foreground font-mono">
-                    18.4
-                  </span>
-                  <span className="text-xs font-mono text-muted-foreground">
-                    KM
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Turn in 450m • Glacier Way
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        <section className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold tracking-tight text-foreground">
-            Shadcn Component Variants
-          </h2>
-          <Card className="border-border bg-card shadow-xs">
-            <CardContent className="flex flex-wrap items-center gap-3 pt-6">
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
               <Button
                 variant="default"
-                className="border border-border/80 shadow-xs"
+                className="w-full sm:w-auto border border-border/80 shadow-xs"
               >
                 <Sparkles className="size-4" />
                 Primary (Polar White)
               </Button>
-              <Button variant="secondary">Secondary (Glacier Blue)</Button>
-              <Button variant="destructive">
-                <ShieldAlert className="size-4" />
+              <Button variant="secondary" className="w-full sm:w-auto">
+                Secondary (Glacier Blue)
+              </Button>
+              <Button variant="destructive" className="w-full sm:w-auto">
                 Destructive (Racing Red)
               </Button>
-              <Button variant="outline">Outline</Button>
-              <Button variant="ghost">Ghost</Button>
-              <Button variant="link">Link</Button>
             </CardContent>
           </Card>
         </section>
       </main>
+
+      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-card/95 backdrop-blur-lg pb-[env(safe-area-inset-bottom,0px)] shadow-lg">
+        <div className="mx-auto flex max-w-lg items-center justify-between gap-3 px-4 py-2.5 sm:max-w-2xl sm:px-6">
+          <div className="flex flex-col">
+            <span className="font-mono text-[11px] text-muted-foreground">
+              Progress
+            </span>
+            <span className="font-mono text-sm font-bold text-foreground">
+              {completedCount} of {checklist.length} Checked
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="min-h-11 border-border font-medium text-xs px-3"
+            >
+              Summary
+            </Button>
+            <Button
+              variant="default"
+              size="sm"
+              className="min-h-11 border border-border/80 shadow-xs font-semibold text-xs px-4"
+            >
+              Continue
+              <ChevronRight className="size-4" />
+            </Button>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
