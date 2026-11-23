@@ -7,16 +7,15 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronUp,
-  Copy,
-  Download,
   FileCheck2,
   HelpCircle,
   Printer,
-  Sparkles,
+  Share2,
+  ShieldCheck,
+  X,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import type {
   ChecklistItemDef,
   InspectionRecord,
@@ -41,9 +40,8 @@ export function SummaryScreen({
 }: SummaryScreenProps) {
   const [copied, setCopied] = useState(false);
   const [showSkipped, setShowSkipped] = useState(false);
-  const [showLogbookCard, setShowLogbookCard] = useState(true);
+  const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
 
-  // Compute all visible items based on bike setup
   const allVisibleItems: ChecklistItemDef[] = [];
   for (const zone of zones) {
     for (const item of zone.items) {
@@ -77,7 +75,6 @@ export function SummaryScreen({
     headlineStatus = "all_clear";
   }
 
-  // Baseline readings captured
   const chassisAnswer = answers["paperwork-chassis"]?.value;
   const engineAnswer = answers["paperwork-engine"]?.value;
   const odoAnswer = answers["controls-odometer-reading"]?.value;
@@ -86,7 +83,6 @@ export function SummaryScreen({
   const oilLevelAnswer = answers["engine-oil-level"]?.value;
   const freeServiceAnswer = answers["fuel-free-service"]?.value;
 
-  // Group issues by severity
   const mustFixIssues = issueItems.filter(
     (i) => answers[i.id]?.severity === "fix_before_delivery",
   );
@@ -112,65 +108,76 @@ export function SummaryScreen({
     });
 
     const lines: string[] = [
-      `*PDI Inspection Summary - ${inspection.bikeModel || "New Vehicle"}*`,
+      `*PDI Delivery Inspection Report - ${inspection.bikeModel || "New Vehicle"}*`,
       `Date: ${dateStr}`,
     ];
 
-    if (chassisAnswer) lines.push(`Chassis / VIN: ${chassisAnswer}`);
+    if (chassisAnswer) lines.push(`Chassis VIN: ${chassisAnswer}`);
     if (engineAnswer) lines.push(`Engine No: ${engineAnswer}`);
-    if (odoAnswer) lines.push(`Odometer: ${odoAnswer} km`);
+    if (odoAnswer) lines.push(`Starting Odometer: ${odoAnswer} km`);
 
     lines.push("");
 
     if (issueItems.length === 0) {
-      lines.push("Status: All checklist items verified and in order.");
+      lines.push(
+        "Status: ALL CHECKS PASSED. Vehicle cleared for customer acceptance.",
+      );
     } else {
-      lines.push(`*Issues flagged for dealer action (${issueItems.length}):*`);
+      lines.push(
+        `*Flagged Defects Requiring Dealer Endorsement (${issueItems.length}):*`,
+      );
       issueItems.forEach((item, idx) => {
         const ans = answers[item.id];
         const severityLabel =
           ans?.severity === "fix_before_delivery"
-            ? "Fix before delivery"
+            ? "FIX BEFORE DELIVERY"
             : ans?.severity === "get_in_writing"
-              ? "Endorse in writing"
+              ? "GET IN WRITING"
               : ans?.severity === "cosmetic"
-                ? "Cosmetic"
-                : "Flagged";
+                ? "COSMETIC"
+                : "FLAGGED";
         const note = ans?.note ? `: "${ans.note}"` : "";
         lines.push(`${idx + 1}. ${item.label} [${severityLabel}]${note}`);
       });
       lines.push("");
       lines.push(
-        "Please confirm in writing that these items will be rectified before vehicle handover.",
+        "Please confirm rectification or endorse on the gate pass with dealer stamp before handover.",
       );
     }
 
     lines.push("");
-    lines.push("Report generated via bikeOS PDI.");
+    lines.push("Generated via bikeOS Pre-Delivery Inspection.");
     return lines.join("\n");
   };
 
-  const handleCopyDealerText = () => {
+  const handleShareReport = async () => {
     const text = generateDealerText();
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+    const title = `PDI Report - ${inspection.bikeModel || "New Vehicle"}`;
+
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title,
+          text,
+        });
+        return;
+      } catch {
+        // Fallback to clipboard & WhatsApp
+      }
+    }
+
+    if (typeof window !== "undefined") {
+      navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+    }
   };
 
   const handlePrint = () => {
     if (typeof window !== "undefined") {
       window.print();
     }
-  };
-
-  const handleDownloadJson = () => {
-    const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(inspection, null, 2))}`;
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `pdi-report-${inspection.id}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
   };
 
   return (
@@ -185,17 +192,24 @@ export function SummaryScreen({
           <span>Back to Checklist</span>
         </button>
 
-        <span className="text-xs font-mono text-muted-foreground">
-          Inspection Summary
-        </span>
+        <div className="flex items-center gap-1.5 font-mono text-xs tracking-wider">
+          <span className="size-2 rounded-full bg-racing-red" />
+          <span className="font-bold text-foreground">bikeOS</span>
+        </div>
       </div>
 
-      <div className="hidden print:block border-b pb-4 mb-4">
-        <h1 className="text-2xl font-bold">
-          bikeOS • Pre-Delivery Inspection (PDI) Report
-        </h1>
-        <p className="text-sm text-gray-600">
-          Vehicle: {inspection.bikeModel || "New Motorcycle"} | Date:{" "}
+      <div className="hidden print:block border-b-2 border-black pb-4 mb-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-black">
+            bikeOS • Pre-Delivery Inspection (PDI) Certificate
+          </h1>
+          <span className="font-mono text-xs font-bold uppercase">
+            Official Report
+          </span>
+        </div>
+        <p className="text-xs text-gray-700 mt-1">
+          Vehicle: <strong>{inspection.bikeModel || "New Motorcycle"}</strong> |
+          Date:{" "}
           {new Date(inspection.createdAt).toLocaleDateString("en-IN", {
             day: "numeric",
             month: "short",
@@ -205,41 +219,35 @@ export function SummaryScreen({
       </div>
 
       <div
-        className={`rounded-2xl border p-5 flex flex-col gap-3 shadow-xs ${
-          headlineStatus === "all_clear"
-            ? "border-glacier-blue bg-glacier-blue/10"
-            : headlineStatus === "issues_to_resolve"
-              ? "border-racing-red/50 bg-racing-red/10"
-              : "border-border bg-card"
-        }`}
+        className={`rounded-2xl border p-4 sm:p-5 flex flex-col gap-3 shadow-xs bg-glacier-blue/10`}
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex flex-col gap-1">
-            <span className="font-mono text-xs uppercase font-bold tracking-wider text-muted-foreground">
-              Overall Status
+            <span className="font-mono text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
+              Delivery Handover Verdict
             </span>
-            <h2 className="text-2xl font-extrabold tracking-tight text-foreground">
-              {headlineStatus === "all_clear" && "All Clear to Sign"}
+            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-foreground">
+              {headlineStatus === "all_clear" && "Clearance: Approved to Sign"}
               {headlineStatus === "issues_to_resolve" &&
-                "Issues Found Before Delivery"}
-              {headlineStatus === "not_finished" && "Inspection Incomplete"}
+                "Clearance: Hold — Rectify Before Signing"}
+              {headlineStatus === "not_finished" &&
+                "Clearance: Inspection Incomplete"}
             </h2>
           </div>
 
           <div
-            className={`flex size-10 shrink-0 items-center justify-center rounded-full font-bold ${
-              headlineStatus === "all_clear"
-                ? "bg-glacier-blue text-slate-900"
-                : headlineStatus === "issues_to_resolve"
-                  ? "bg-racing-red text-white"
-                  : "bg-muted text-foreground"
-            }`}
+            className={`flex size-10 shrink-0 items-center justify-center rounded-xl font-bold ${headlineStatus === "all_clear"
+              ? "bg-glacier-blue text-slate-950 shadow-xs"
+              : headlineStatus === "issues_to_resolve"
+                ? "bg-racing-red text-white shadow-md shadow-racing-red/25"
+                : "bg-muted text-foreground"
+              }`}
           >
             {headlineStatus === "all_clear" && (
               <CheckCircle2 className="size-6" />
             )}
             {headlineStatus === "issues_to_resolve" && (
-              <AlertTriangle className="size-6" />
+              <AlertTriangle className="size-6 text-white" />
             )}
             {headlineStatus === "not_finished" && (
               <FileCheck2 className="size-6" />
@@ -249,11 +257,11 @@ export function SummaryScreen({
 
         <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed font-medium">
           {headlineStatus === "all_clear" &&
-            "Every visible item has been inspected and verified with zero recorded issues. You can proceed with signing the delivery documents."}
+            "Every visible item has been inspected and verified with zero recorded defects. You can safely proceed with signing the dealer delivery note."}
           {headlineStatus === "issues_to_resolve" &&
-            "Do not accept delivery or sign the gate pass until these flagged issues are resolved or endorsed in writing with dealer stamp."}
+            "Do not sign the delivery gate pass until these flagged defects are resolved or officially endorsed in writing with the dealer stamp."}
           {headlineStatus === "not_finished" &&
-            `You still have ${uncheckedItems.length} unchecked items out of ${totalVisible}. Finish all checks before signing delivery papers.`}
+            `${uncheckedItems.length} checks remain uninspected. Signing the gate pass now relieves the dealership of legal responsibility for undiscovered flaws.`}
         </p>
 
         <div className="grid grid-cols-4 gap-2 pt-2 border-t border-border/60 text-center font-mono text-xs">
@@ -263,7 +271,7 @@ export function SummaryScreen({
           </div>
           <div className="flex flex-col">
             <span className="text-muted-foreground text-[10px]">VERIFIED</span>
-            <span className="font-bold text-slate-800 dark:text-slate-200">
+            <span className="font-bold text-sky-950 dark:text-sky-200">
               {okItems.length}
             </span>
           </div>
@@ -285,39 +293,34 @@ export function SummaryScreen({
       <div className="flex flex-wrap items-center gap-2.5 print:hidden">
         <Button
           type="button"
-          variant="default"
-          size="default"
-          onClick={handleCopyDealerText}
-          className="flex-1 sm:flex-none bg-foreground text-background font-semibold"
+          size="lg"
+          onClick={handleShareReport}
+          className={`flex-1 font-bold text-xs sm:text-sm py-5 px-4 shadow-sm justify-center gap-1.5 transition-all ${hasIssues
+            ? "bg-racing-red text-white hover:bg-racing-red/90 shadow-racing-red/25"
+            : "bg-glacier-blue text-slate-950 hover:bg-glacier-blue/90 border border-glacier-blue"
+            }`}
         >
           {copied ? (
-            <Check className="size-4 text-green-500" />
+            <Check className="size-4" />
           ) : (
-            <Copy className="size-4" />
+            <Share2 className="size-4" />
           )}
-          <span>{copied ? "Copied Issues!" : "Copy for WhatsApp"}</span>
+          <span>
+            {copied
+              ? "Report Copied to Clipboard"
+              : "Send Report to Dealer (WhatsApp)"}
+          </span>
         </Button>
 
         <Button
           type="button"
           variant="outline"
-          size="default"
+          size="lg"
           onClick={handlePrint}
-          className="gap-1.5"
+          className="gap-1.5 font-semibold text-xs border-border/80 hover:bg-muted py-5 px-4"
         >
-          <Printer className="size-4" />
+          <Printer className="size-4 text-glacier-blue" />
           <span>Print / PDF</span>
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          size="default"
-          onClick={handleDownloadJson}
-          className="gap-1.5"
-        >
-          <Download className="size-4" />
-          <span>Save Data</span>
         </Button>
       </div>
 
@@ -326,99 +329,106 @@ export function SummaryScreen({
         odoAnswer ||
         frontTyrePressure ||
         rearTyrePressure) && (
-        <div className="rounded-xl border border-border bg-card p-4 flex flex-col gap-3 shadow-2xs">
-          <span className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
-            Baseline Vehicle Readings
-          </span>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-            {chassisAnswer && (
-              <div className="flex flex-col">
-                <span className="text-muted-foreground text-[11px]">
-                  Chassis / VIN
-                </span>
-                <span className="font-mono font-bold text-foreground break-all">
-                  {chassisAnswer}
-                </span>
-              </div>
-            )}
-            {engineAnswer && (
-              <div className="flex flex-col">
-                <span className="text-muted-foreground text-[11px]">
-                  Engine Number
-                </span>
-                <span className="font-mono font-bold text-foreground break-all">
-                  {engineAnswer}
-                </span>
-              </div>
-            )}
-            {odoAnswer && (
-              <div className="flex flex-col">
-                <span className="text-muted-foreground text-[11px]">
-                  Starting Odometer
-                </span>
-                <span className="font-mono font-bold text-foreground">
-                  {odoAnswer} km
-                </span>
-              </div>
-            )}
-            {frontTyrePressure && (
-              <div className="flex flex-col">
-                <span className="text-muted-foreground text-[11px]">
-                  Front Tyre Pressure
-                </span>
-                <span className="font-mono font-bold text-foreground">
-                  {frontTyrePressure} psi
-                </span>
-              </div>
-            )}
-            {rearTyrePressure && (
-              <div className="flex flex-col">
-                <span className="text-muted-foreground text-[11px]">
-                  Rear Tyre Pressure
-                </span>
-                <span className="font-mono font-bold text-foreground">
-                  {rearTyrePressure} psi
-                </span>
-              </div>
-            )}
-            {oilLevelAnswer && (
-              <div className="flex flex-col">
-                <span className="text-muted-foreground text-[11px]">
-                  Oil Level
-                </span>
-                <span className="font-mono font-bold text-foreground">
-                  {oilLevelAnswer}
-                </span>
-              </div>
-            )}
-            {freeServiceAnswer && (
-              <div className="flex flex-col">
-                <span className="text-muted-foreground text-[11px]">
-                  1st Free Service Due
-                </span>
-                <span className="font-mono font-bold text-foreground">
-                  {freeServiceAnswer}
-                </span>
-              </div>
-            )}
+          <div className="rounded-xl border border-border bg-card p-4 flex flex-col gap-3 shadow-2xs">
+            <div className="flex items-center justify-between border-b border-border/60 pb-2">
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Baseline Vehicle Identity &amp; Readings
+              </span>
+              <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold text-sky-950 dark:text-sky-200 bg-glacier-blue/20 border border-glacier-blue/40 px-2 py-0.5 rounded-full">
+                <ShieldCheck className="size-3 text-glacier-blue" />
+                Day 1 Baseline
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+              {chassisAnswer && (
+                <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
+                  <span className="text-muted-foreground text-[10px] font-mono">
+                    CHASSIS VIN STAMPING
+                  </span>
+                  <span className="font-mono font-bold text-foreground break-all pt-0.5">
+                    {chassisAnswer}
+                  </span>
+                </div>
+              )}
+              {engineAnswer && (
+                <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
+                  <span className="text-muted-foreground text-[10px] font-mono">
+                    ENGINE NUMBER
+                  </span>
+                  <span className="font-mono font-bold text-foreground break-all pt-0.5">
+                    {engineAnswer}
+                  </span>
+                </div>
+              )}
+              {odoAnswer && (
+                <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
+                  <span className="text-muted-foreground text-[10px] font-mono">
+                    DELIVERY ODOMETER
+                  </span>
+                  <span className="font-mono font-bold text-foreground pt-0.5">
+                    {odoAnswer} km
+                  </span>
+                </div>
+              )}
+              {frontTyrePressure && (
+                <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
+                  <span className="text-muted-foreground text-[10px] font-mono">
+                    FRONT TYRE PRESSURE
+                  </span>
+                  <span className="font-mono font-bold text-foreground pt-0.5">
+                    {frontTyrePressure} psi
+                  </span>
+                </div>
+              )}
+              {rearTyrePressure && (
+                <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
+                  <span className="text-muted-foreground text-[10px] font-mono">
+                    REAR TYRE PRESSURE
+                  </span>
+                  <span className="font-mono font-bold text-foreground pt-0.5">
+                    {rearTyrePressure} psi
+                  </span>
+                </div>
+              )}
+              {oilLevelAnswer && (
+                <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
+                  <span className="text-muted-foreground text-[10px] font-mono">
+                    ENGINE OIL SIGHT GLASS
+                  </span>
+                  <span className="font-mono font-bold text-foreground pt-0.5">
+                    {oilLevelAnswer}
+                  </span>
+                </div>
+              )}
+              {freeServiceAnswer && (
+                <div className="flex flex-col p-2.5 rounded-lg border border-border/80 bg-background/50">
+                  <span className="text-muted-foreground text-[10px] font-mono">
+                    1ST FREE SERVICE
+                  </span>
+                  <span className="font-mono font-bold text-foreground pt-0.5">
+                    {freeServiceAnswer}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {hasIssues && (
         <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between border-b border-border/60 pb-2">
             <h3 className="text-base font-bold text-foreground flex items-center gap-2">
               <AlertTriangle className="size-4 text-racing-red" />
-              Flagged Issues ({issueItems.length})
+              Flagged Defects Requiring Dealer Endorsement ({issueItems.length})
             </h3>
           </div>
 
           <div className="flex flex-col gap-3">
             {mustFixIssues.length > 0 && (
               <div className="flex flex-col gap-2">
-                <span className="text-xs font-bold text-racing-red uppercase tracking-wider">
-                  Fix Before Delivery ({mustFixIssues.length})
+                <span className="text-xs font-mono font-bold text-racing-red uppercase tracking-wider">
+                  Mandatory: Fix Before Delivery ({mustFixIssues.length})
                 </span>
                 {mustFixIssues.map((item) => (
                   <IssueSummaryCard
@@ -426,6 +436,7 @@ export function SummaryScreen({
                     item={item}
                     answer={answers[item.id]}
                     onJump={() => onJumpToItem(item.id, item.zoneId)}
+                    onViewPhoto={(url) => setPreviewPhoto(url)}
                   />
                 ))}
               </div>
@@ -433,8 +444,8 @@ export function SummaryScreen({
 
             {inWritingIssues.length > 0 && (
               <div className="flex flex-col gap-2 pt-1">
-                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-                  Get In Writing on Delivery Note ({inWritingIssues.length})
+                <span className="text-xs font-mono font-bold text-sky-950 dark:text-sky-200 uppercase tracking-wider">
+                  Endorse in Writing on Gate Pass ({inWritingIssues.length})
                 </span>
                 {inWritingIssues.map((item) => (
                   <IssueSummaryCard
@@ -442,6 +453,7 @@ export function SummaryScreen({
                     item={item}
                     answer={answers[item.id]}
                     onJump={() => onJumpToItem(item.id, item.zoneId)}
+                    onViewPhoto={(url) => setPreviewPhoto(url)}
                   />
                 ))}
               </div>
@@ -449,8 +461,8 @@ export function SummaryScreen({
 
             {cosmeticIssues.length > 0 && (
               <div className="flex flex-col gap-2 pt-1">
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                  Cosmetic Blemishes ({cosmeticIssues.length})
+                <span className="text-xs font-mono font-bold text-muted-foreground uppercase tracking-wider">
+                  Cosmetic Paint &amp; Panel Flaws ({cosmeticIssues.length})
                 </span>
                 {cosmeticIssues.map((item) => (
                   <IssueSummaryCard
@@ -458,6 +470,7 @@ export function SummaryScreen({
                     item={item}
                     answer={answers[item.id]}
                     onJump={() => onJumpToItem(item.id, item.zoneId)}
+                    onViewPhoto={(url) => setPreviewPhoto(url)}
                   />
                 ))}
               </div>
@@ -465,8 +478,8 @@ export function SummaryScreen({
 
             {otherIssues.length > 0 && (
               <div className="flex flex-col gap-2 pt-1">
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                  Other Issues ({otherIssues.length})
+                <span className="text-xs font-mono font-bold text-muted-foreground uppercase tracking-wider">
+                  Other Observations ({otherIssues.length})
                 </span>
                 {otherIssues.map((item) => (
                   <IssueSummaryCard
@@ -474,6 +487,7 @@ export function SummaryScreen({
                     item={item}
                     answer={answers[item.id]}
                     onJump={() => onJumpToItem(item.id, item.zoneId)}
+                    onViewPhoto={(url) => setPreviewPhoto(url)}
                   />
                 ))}
               </div>
@@ -487,14 +501,18 @@ export function SummaryScreen({
           <div className="flex items-center justify-between">
             <span className="font-semibold text-xs text-foreground flex items-center gap-1.5">
               <FileCheck2 className="size-4 text-glacier-blue" />
-              Unchecked Items ({uncheckedItems.length})
+              Uninspected Items ({uncheckedItems.length})
             </span>
-            <span className="text-[11px] text-muted-foreground">
-              Tap to inspect
-            </span>
+            <button
+              type="button"
+              onClick={onBackToChecklist}
+              className="text-xs font-bold text-sky-950 dark:text-sky-200 hover:underline"
+            >
+              Resume Checklist &rarr;
+            </button>
           </div>
 
-          <div className="flex flex-col gap-1.5 pt-1">
+          <div className="flex flex-col gap-1.5 pt-1 max-h-48 overflow-y-auto">
             {uncheckedItems.map((item) => (
               <button
                 key={item.id}
@@ -513,7 +531,7 @@ export function SummaryScreen({
       )}
 
       {naItems.length > 0 && (
-        <div className="rounded-xl border border-border bg-card/60 p-4 flex flex-col gap-2 print:hidden">
+        <div className="rounded-xl border border-border bg-card/60 p-3.5 flex flex-col gap-2 print:hidden">
           <button
             type="button"
             onClick={() => setShowSkipped(!showSkipped)}
@@ -521,7 +539,7 @@ export function SummaryScreen({
           >
             <span className="flex items-center gap-1.5">
               <HelpCircle className="size-4" />
-              Skipped Items ({naItems.length})
+              Skipped / Not Applicable ({naItems.length})
             </span>
             {showSkipped ? (
               <ChevronUp className="size-3.5" />
@@ -535,7 +553,7 @@ export function SummaryScreen({
               {naItems.map((item) => (
                 <div
                   key={item.id}
-                  className="text-xs text-muted-foreground py-1"
+                  className="text-xs text-muted-foreground py-0.5"
                 >
                   • {item.label}
                 </div>
@@ -545,48 +563,53 @@ export function SummaryScreen({
         </div>
       )}
 
-      {showLogbookCard && (
-        <Card className="border-border bg-polar-white/60 dark:bg-card shadow-xs print:hidden">
-          <CardContent className="p-4 sm:p-5 flex flex-col gap-3">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="flex size-7 items-center justify-center rounded-lg bg-foreground text-background font-mono font-bold text-xs">
-                  OS
-                </span>
-                <span className="font-bold text-sm text-foreground">
-                  Start your bike&apos;s logbook with bikeOS
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowLogbookCard(false)}
-                className="text-xs text-muted-foreground hover:text-foreground"
-              >
-                Dismiss
-              </button>
-            </div>
+      {/* Official Signatures Block for Print / PDF */}
+      <div className="hidden print:flex flex-col gap-6 mt-8 pt-8 border-t-2 border-black">
+        <span className="text-xs font-mono font-bold uppercase tracking-wider text-black">
+          Official Vehicle Delivery Acceptance &amp; Defect Endorsement
+        </span>
+        <div className="grid grid-cols-2 gap-10 pt-4">
+          <div className="flex flex-col justify-between h-28 border-t border-black pt-2">
+            <span className="text-xs font-bold">
+              Customer Acceptance Signature
+            </span>
+            <span className="text-[10px] text-gray-600">
+              Date: ________________________
+            </span>
+          </div>
+          <div className="flex flex-col justify-between h-28 border-t border-black pt-2">
+            <span className="text-xs font-bold">
+              Dealership Representative &amp; Official Seal
+            </span>
+            <span className="text-[10px] text-gray-600">
+              Date: ________________________
+            </span>
+          </div>
+        </div>
+      </div>
 
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              We can keep this vehicle&apos;s starting odometer (
-              {odoAnswer || "0"} km), tyre pressures, chassis VIN, and warranty
-              follow-ups as the permanent Day 1 record in your bikeOS logbook to
-              monitor maintenance and service dates.
-            </p>
-
-            <div className="flex items-center gap-2 pt-1">
-              <Button
-                type="button"
-                variant="default"
-                size="sm"
-                onClick={handleDownloadJson}
-                className="bg-foreground text-background font-semibold"
-              >
-                <Sparkles className="size-3.5" />
-                <span>Export Day 1 Logbook</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      {previewPhoto && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+        >
+          <div className="relative max-w-lg w-full rounded-2xl overflow-hidden bg-black">
+            <button
+              type="button"
+              onClick={() => setPreviewPhoto(null)}
+              className="absolute top-3 right-3 size-8 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-white/20"
+            >
+              <X className="size-4" />
+            </button>
+            {/* biome-ignore lint/performance/noImgElement: photo modal preview */}
+            <img
+              src={previewPhoto}
+              alt="Defect proof fullscreen"
+              className="w-full max-h-[80vh] object-contain"
+            />
+          </div>
+        </div>
       )}
 
       <div className="flex flex-col gap-2 pt-4 border-t border-border print:hidden">
@@ -595,7 +618,7 @@ export function SummaryScreen({
           variant="outline"
           size="default"
           onClick={onStartNewInspection}
-          className="text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground text-xs"
         >
           Start a new inspection
         </Button>
@@ -608,6 +631,7 @@ function IssueSummaryCard({
   item,
   answer,
   onJump,
+  onViewPhoto,
 }: {
   item: ChecklistItemDef;
   answer?: {
@@ -616,45 +640,94 @@ function IssueSummaryCard({
     photos?: { id: string; dataUrl: string }[];
   };
   onJump: () => void;
+  onViewPhoto: (dataUrl: string) => void;
 }) {
+  const severityLabel =
+    answer?.severity === "fix_before_delivery"
+      ? "Fix Before Delivery"
+      : answer?.severity === "get_in_writing"
+        ? "Get In Writing"
+        : answer?.severity === "cosmetic"
+          ? "Cosmetic"
+          : "Flagged";
+
+  const isFixBefore = answer?.severity === "fix_before_delivery";
+  const isWriting = answer?.severity === "get_in_writing";
+
   return (
-    <div className="rounded-xl border border-border bg-card p-3.5 flex flex-col gap-2 shadow-2xs">
+    <div
+      className={`rounded-xl border p-3.5 flex flex-col gap-2.5 shadow-2xs bg-card ${isFixBefore
+        ? "border-l-4 border-l-racing-red border-racing-red/40"
+        : isWriting
+          ? "border-l-4 border-l-glacier-blue border-glacier-blue/40"
+          : "border-border"
+        }`}
+    >
       <div className="flex items-start justify-between gap-2">
-        <span className="font-semibold text-xs text-foreground leading-snug">
-          {item.label}
-        </span>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-xs sm:text-sm text-foreground leading-snug">
+            {item.label}
+          </span>
+          <span
+            className={`rounded-full px-2 py-0.2 font-mono text-[10px] font-bold ${isFixBefore
+              ? "bg-racing-red/15 text-racing-red border border-racing-red/30"
+              : isWriting
+                ? "bg-glacier-blue/20 text-sky-950 dark:text-sky-200 border border-glacier-blue/40"
+                : "bg-muted text-muted-foreground border border-border"
+              }`}
+          >
+            {severityLabel}
+          </span>
+        </div>
         <button
           type="button"
           onClick={onJump}
-          className="text-[10px] font-mono text-muted-foreground hover:text-foreground shrink-0"
+          className="text-[10px] font-mono font-bold text-sky-950 dark:text-sky-200 hover:underline shrink-0"
         >
           Edit &rarr;
         </button>
       </div>
 
       {answer?.note && (
-        <p className="text-xs text-muted-foreground bg-muted/40 p-2 rounded-lg italic">
+        <p className="text-xs text-foreground bg-muted/40 p-2.5 rounded-lg italic border border-border/50">
           &ldquo;{answer.note}&rdquo;
         </p>
       )}
 
       {answer?.photos && answer.photos.length > 0 && (
-        <div className="flex items-center gap-2 pt-1">
+        <div className="flex items-center gap-2 pt-0.5">
           {answer.photos.map((p) => (
-            <div
+            <button
               key={p.id}
-              className="size-12 rounded-lg overflow-hidden border border-border bg-muted shrink-0"
+              type="button"
+              onClick={() => onViewPhoto(p.dataUrl)}
+              className="size-14 rounded-lg overflow-hidden border border-border bg-muted shrink-0 cursor-pointer p-0 block hover:opacity-90"
+              title="View full evidence photo"
             >
               {/* biome-ignore lint/performance/noImgElement: user captured base64 dataUrl */}
               <img
                 src={p.dataUrl}
-                alt="Defect"
+                alt="Defect proof"
                 className="size-full object-cover"
               />
-            </div>
+            </button>
           ))}
+          <span className="text-[10px] text-muted-foreground font-mono">
+            Tap photo to enlarge
+          </span>
         </div>
       )}
+
+      <div className="text-[11px] text-muted-foreground bg-background/50 p-2 rounded-lg border border-border/50 leading-normal">
+        <strong className="text-foreground">Showroom Action: </strong>
+        {isFixBefore &&
+          "Do not sign gate pass until dealership rectifies this issue."}
+        {isWriting &&
+          "Demand defect is endorsed on delivery receipt counter-signed with dealer stamp."}
+        {!isFixBefore &&
+          !isWriting &&
+          "Record cosmetic blemish on warranty registration paper before handover."}
+      </div>
     </div>
   );
 }
