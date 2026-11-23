@@ -201,6 +201,8 @@
   }
   body {
     @apply bg-background text-foreground min-h-screen antialiased;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   html {
     @apply font-sans;
