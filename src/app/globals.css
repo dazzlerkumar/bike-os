@@ -63,7 +63,7 @@
   --glacier-blue: oklch(0.805 0.058 235.6);
   --racing-red: oklch(0.579 0.234 23.9);
 
-  --background: oklch(0.99 0.002 235);
+  --background: var(--polar-white);
   --foreground: oklch(0.18 0.015 240);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.18 0.015 240);

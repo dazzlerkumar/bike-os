@@ -35,6 +35,7 @@ import { ZoneAccordion } from "./zone-accordion";
 
 interface PdiClientProps {
   zones?: ZoneDef[];
+  guideContent?: React.ReactNode;
 }
 
 type Stage = "landing" | "setup" | "checklist" | "summary";
@@ -42,7 +43,7 @@ type Stage = "landing" | "setup" | "checklist" | "summary";
 const PREPARE_DISMISSED_KEY = "bikeos_pdi_prepare_dismissed";
 const SHOW_HINTS_KEY = "bikeos_pdi_show_hints";
 
-export function PdiClient({ zones = PDI_ZONES }: PdiClientProps) {
+export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
   const [stage, setStage] = useState<Stage>("landing");
   const [inspection, setInspection] = useState<InspectionRecord | null>(null);
   const [activeZoneId, setActiveZoneId] = useState<string>("paperwork");
@@ -234,6 +235,7 @@ export function PdiClient({ zones = PDI_ZONES }: PdiClientProps) {
         onStart={handleStartFresh}
         onContinue={handleContinueExisting}
         onResetAndStartNew={handleStartFresh}
+        referenceGuide={guideContent}
       />
     );
   }

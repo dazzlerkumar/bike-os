@@ -79,114 +79,123 @@ export default function PdiPage() {
     ],
   };
 
+  const referenceGuide = (
+    <section
+      id="pdi-reference-guide"
+      className="print:hidden border-t border-border pt-8 mt-2 flex flex-col gap-6"
+    >
+      <header className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-xs font-bold text-sky-950 dark:text-sky-200 bg-glacier-blue/20 border border-glacier-blue/40 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            Technical Manual
+          </span>
+          <span className="h-px flex-1 bg-gradient-to-r from-glacier-blue/50 via-racing-red/40 to-transparent" />
+        </div>
+        <h2 className="text-xl sm:text-2xl font-black tracking-tight text-foreground">
+          Two-Wheeler Delivery Inspection Protocol
+        </h2>
+        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+          Showroom checklist reference covering physical integrity, mechanical
+          sealing, electrical diagnostics, and legal paperwork.
+        </p>
+      </header>
+
+      <div className="flex flex-col gap-3">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground font-mono">
+          Protocol Zones ({PDI_ZONES.length} Stages)
+        </h3>
+
+        <div className="flex flex-col gap-2.5">
+          {PDI_ZONES.map((zone) => (
+            <details
+              key={zone.id}
+              className="group rounded-xl border border-border/80 bg-card p-3.5 transition-all hover:border-glacier-blue/40"
+            >
+              <summary className="flex cursor-pointer items-center justify-between font-semibold text-xs sm:text-sm text-foreground list-none select-none">
+                <span className="flex items-center gap-2">
+                  <span className="flex size-5 items-center justify-center rounded-md bg-muted font-mono text-[11px] font-bold text-foreground">
+                    {zone.order}
+                  </span>
+                  <span>{zone.title}</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
+                  <span className="rounded bg-muted px-1.5 py-0.5 font-medium">
+                    {zone.items.length} checks
+                  </span>
+                  <span className="group-open:rotate-180 transition-transform text-xs">
+                    ▼
+                  </span>
+                </span>
+              </summary>
+              <p className="text-xs text-muted-foreground pt-2 pb-2.5">
+                {zone.description}
+              </p>
+              <ol className="flex flex-col gap-2 border-t border-border/70 pt-2.5 text-xs text-foreground/90 pl-4 list-decimal">
+                {zone.items.map((item) => (
+                  <li key={item.id} className="leading-relaxed">
+                    <strong className="text-foreground">{item.label}</strong>
+                    <p className="text-muted-foreground mt-0.5">{item.hint}</p>
+                  </li>
+                ))}
+              </ol>
+            </details>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 pt-3 border-t border-border/70">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground font-mono">
+          Showroom FAQ
+        </h3>
+
+        <div className="flex flex-col gap-2.5 text-xs leading-relaxed">
+          <article className="rounded-xl border border-border/80 bg-card p-3.5 flex flex-col gap-1.5 hover:border-racing-red/30 transition-colors">
+            <h4 className="font-bold text-xs sm:text-sm text-foreground">
+              Can a dealer force me to sign the delivery receipt first?
+            </h4>
+            <p className="text-muted-foreground">
+              Never sign the delivery acceptance receipt until you have
+              personally inspected the vehicle in bright natural daylight. Once
+              you sign, the dealership is legally relieved of responsibility for
+              cosmetic flaws, paint scratches, and missing toolkits.
+            </p>
+          </article>
+
+          <article className="rounded-xl border border-border/80 bg-card p-3.5 flex flex-col gap-1.5 hover:border-glacier-blue/40 transition-colors">
+            <h4 className="font-bold text-xs sm:text-sm text-foreground">
+              What documents must match the physical vehicle?
+            </h4>
+            <p className="text-muted-foreground">
+              The 17-digit Chassis VIN stamped on the headstock and the engine
+              number stamped on the crankcase must match the Tax Invoice,
+              Insurance Policy, and Temporary Registration papers down to every
+              single digit.
+            </p>
+          </article>
+
+          <article className="rounded-xl border border-border/80 bg-card p-3.5 flex flex-col gap-1.5 hover:border-glacier-blue/40 transition-colors">
+            <h4 className="font-bold text-xs sm:text-sm text-foreground">
+              What if the dealer doesn&apos;t allow a test ride?
+            </h4>
+            <p className="text-muted-foreground">
+              Many dealerships do not allow dynamic road rides before permanent
+              registration. In that case, mark the test ride zone as N/A in the
+              checklist, and conduct all stationary engine, idle, and clutch
+              checks on the centre stand.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+  );
+
   return (
     <>
       <script type="application/ld+json">{JSON.stringify(jsonLdHowTo)}</script>
       <script type="application/ld+json">{JSON.stringify(jsonLdFaq)}</script>
 
       <div className="min-h-dvh flex flex-col bg-background text-foreground">
-        <PdiClient />
-
-        {/* Server-Rendered SEO Content and Fallback Guide for Crawlers & Search Engines */}
-        <section className="print:hidden border-t border-border bg-card/40 py-12 px-4 sm:px-6">
-          <div className="mx-auto max-w-xl flex flex-col gap-8">
-            <header className="flex flex-col gap-2">
-              <span className="font-mono text-xs font-bold text-glacier-blue uppercase tracking-wider">
-                Vehicle Buyer Guide
-              </span>
-              <h2 className="text-2xl font-bold tracking-tight text-foreground">
-                Complete Two-Wheeler Pre-Delivery Inspection Checklist
-              </h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Use this comprehensive showroom checklist to inspect every
-                critical component of your new motorcycle or scooter before
-                signing the delivery acceptance receipt.
-              </p>
-            </header>
-
-            <div className="flex flex-col gap-4">
-              <h3 className="text-lg font-bold text-foreground">
-                Inspection Zones &amp; Checklist Items
-              </h3>
-
-              <div className="flex flex-col gap-3">
-                {PDI_ZONES.map((zone) => (
-                  <details
-                    key={zone.id}
-                    className="group rounded-xl border border-border bg-card p-4 transition-all"
-                  >
-                    <summary className="flex cursor-pointer items-center justify-between font-semibold text-sm text-foreground list-none select-none">
-                      <span>
-                        {zone.order}. {zone.title} ({zone.items.length} checks)
-                      </span>
-                      <span className="text-xs text-muted-foreground group-open:rotate-180 transition-transform">
-                        ▼
-                      </span>
-                    </summary>
-                    <p className="text-xs text-muted-foreground pt-2 pb-3">
-                      {zone.description}
-                    </p>
-                    <ol className="flex flex-col gap-2 border-t border-border pt-3 text-xs text-foreground/90 pl-4 list-decimal">
-                      {zone.items.map((item) => (
-                        <li key={item.id} className="leading-relaxed">
-                          <strong>{item.label}</strong>
-                          <p className="text-muted-foreground mt-0.5">
-                            {item.hint}
-                          </p>
-                        </li>
-                      ))}
-                    </ol>
-                  </details>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-4 pt-4 border-t border-border">
-              <h3 className="text-lg font-bold text-foreground">
-                Frequently Asked Questions
-              </h3>
-
-              <div className="flex flex-col gap-3 text-xs leading-relaxed">
-                <article className="rounded-xl border border-border bg-card p-4 flex flex-col gap-1.5">
-                  <h4 className="font-semibold text-sm text-foreground">
-                    Can a motorcycle dealer force me to sign the delivery note
-                    first?
-                  </h4>
-                  <p className="text-muted-foreground">
-                    Never sign the delivery acceptance receipt until you have
-                    personally inspected the vehicle in bright light. Once you
-                    sign, the dealer is legally relieved of responsibility for
-                    cosmetic flaws, paint scratches, and missing accessories.
-                  </p>
-                </article>
-
-                <article className="rounded-xl border border-border bg-card p-4 flex flex-col gap-1.5">
-                  <h4 className="font-semibold text-sm text-foreground">
-                    What documents must match the physical vehicle?
-                  </h4>
-                  <p className="text-muted-foreground">
-                    The 17-digit Chassis VIN stamped on the headstock and the
-                    engine number stamped on the crankcase must match the Tax
-                    Invoice, Insurance Policy, and Temporary Registration papers
-                    down to every single digit.
-                  </p>
-                </article>
-
-                <article className="rounded-xl border border-border bg-card p-4 flex flex-col gap-1.5">
-                  <h4 className="font-semibold text-sm text-foreground">
-                    What if the dealer doesn&apos;t allow a test ride?
-                  </h4>
-                  <p className="text-muted-foreground">
-                    Many dealerships do not allow dynamic road rides before
-                    permanent registration. In that case, mark the test ride
-                    zone as N/A in the checklist, and conduct all stationary
-                    engine, idle, and clutch checks on the centre stand.
-                  </p>
-                </article>
-              </div>
-            </div>
-          </div>
-        </section>
+        <PdiClient guideContent={referenceGuide} />
       </div>
     </>
   );
