@@ -53,7 +53,10 @@ export function LandingScreen({
 
         <div className="flex flex-col items-center gap-6 py-14 sm:py-20">
           <h1 className="text-center text-3xl font-black leading-[1.1] tracking-tight text-foreground sm:text-4xl">
-            Check your new bike <br /><span className="bg-gradient-to-r from-racing-red via-racing-red to-orange-600 bg-clip-text text-transparent">before you sign for it.</span>
+            Check your new bike <br />
+            <span className="bg-gradient-to-r from-racing-red via-racing-red to-orange-600 bg-clip-text text-transparent">
+              before you sign for it.
+            </span>
           </h1>
 
           <p className="max-w-md text-base leading-relaxed text-muted-foreground">
