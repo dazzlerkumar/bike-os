@@ -334,10 +334,11 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
             <button
               type="button"
               onClick={handleToggleHints}
-              className={`flex size-9 items-center justify-center rounded-lg border transition-colors ${showHints
+              className={`flex size-9 items-center justify-center rounded-lg border transition-colors ${
+                showHints
                   ? "border-glacier-blue bg-glacier-blue/20 text-sky-950 dark:text-sky-200"
                   : "border-border bg-card text-muted-foreground hover:text-foreground"
-                }`}
+              }`}
               title={showHints ? "Hide hints" : "Expand all hints"}
             >
               {showHints ? (
@@ -428,14 +429,15 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
                       el.scrollIntoView({ behavior: "smooth", block: "start" });
                     }
                   }}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition-all select-none ${isActive
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition-all select-none ${
+                    isActive
                       ? "border border-glacier-blue bg-glacier-blue/20 text-sky-950 dark:text-sky-200 font-bold shadow-2xs"
                       : zComplete
                         ? zIssues > 0
                           ? "border border-racing-red/40 bg-racing-red/10 text-racing-red font-semibold"
                           : "border border-glacier-blue/40 bg-glacier-blue/10 text-sky-950 dark:text-sky-200"
                         : "border border-border/80 bg-card text-muted-foreground hover:text-foreground"
-                    }`}
+                  }`}
                 >
                   <span>
                     {zone.order}. {zone.shortTitle}
@@ -502,10 +504,11 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
             type="button"
             size="default"
             onClick={handleNextUnchecked}
-            className={`min-h-11 flex-1 font-bold text-xs shadow-sm justify-center gap-1.5 transition-all group ${answeredCount === totalVisibleCount
+            className={`min-h-11 flex-1 font-bold text-xs shadow-sm justify-center gap-1.5 transition-all group ${
+              answeredCount === totalVisibleCount
                 ? "bg-racing-red text-white hover:bg-racing-red/90 shadow-md shadow-racing-red/25"
                 : "bg-foreground text-background hover:bg-foreground/90"
-              }`}
+            }`}
           >
             <span>
               {answeredCount === totalVisibleCount
@@ -515,10 +518,11 @@ export function PdiClient({ zones = PDI_ZONES, guideContent }: PdiClientProps) {
                   : "Next Unchecked"}
             </span>
             <ChevronRight
-              className={`size-4 transition-transform group-hover:translate-x-0.5 ${answeredCount === totalVisibleCount
+              className={`size-4 transition-transform group-hover:translate-x-0.5 ${
+                answeredCount === totalVisibleCount
                   ? "text-white"
                   : "text-racing-red"
-                }`}
+              }`}
             />
           </Button>
         </div>

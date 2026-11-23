@@ -180,15 +180,17 @@ export function SetupScreen({
                 key={preset.id}
                 type="button"
                 onClick={() => setSetup(preset.setup)}
-                className={`flex items-start justify-between gap-3 p-3.5 rounded-xl border text-left transition-all ${isSelected
+                className={`flex items-start justify-between gap-3 p-3.5 rounded-xl border text-left transition-all ${
+                  isSelected
                     ? "border-glacier-blue/60 bg-glacier-blue/10 dark:bg-glacier-blue/15 shadow-2xs"
                     : "border-border/80 bg-card hover:border-border text-foreground"
-                  }`}
+                }`}
               >
                 <div className="flex flex-col gap-1 min-w-0">
                   <span
-                    className={`text-sm font-bold tracking-tight ${isSelected ? "text-foreground" : "text-foreground/90"
-                      }`}
+                    className={`text-sm font-bold tracking-tight ${
+                      isSelected ? "text-foreground" : "text-foreground/90"
+                    }`}
                   >
                     {preset.title}
                   </span>
@@ -197,10 +199,11 @@ export function SetupScreen({
                   </span>
                 </div>
                 <div
-                  className={`flex size-5 shrink-0 items-center justify-center rounded-full border transition-colors mt-0.5 ${isSelected
+                  className={`flex size-5 shrink-0 items-center justify-center rounded-full border transition-colors mt-0.5 ${
+                    isSelected
                       ? "border-glacier-blue bg-glacier-blue text-slate-900"
                       : "border-muted-foreground/30 bg-transparent"
-                    }`}
+                  }`}
                 >
                   {isSelected && <Check className="size-3 stroke-[3]" />}
                 </div>
@@ -224,8 +227,9 @@ export function SetupScreen({
             </span>
           </div>
           <ChevronDown
-            className={`size-4 text-muted-foreground transition-transform ${showCustom ? "rotate-180" : ""
-              }`}
+            className={`size-4 text-muted-foreground transition-transform ${
+              showCustom ? "rotate-180" : ""
+            }`}
           />
         </button>
 
@@ -248,10 +252,11 @@ export function SetupScreen({
                     onClick={() =>
                       updateField("drive", option.id as BikeSetup["drive"])
                     }
-                    className={`min-h-10 rounded-lg border text-xs font-medium transition-all ${setup.drive === option.id
+                    className={`min-h-10 rounded-lg border text-xs font-medium transition-all ${
+                      setup.drive === option.id
                         ? "border-glacier-blue bg-glacier-blue/20 text-foreground font-bold shadow-2xs"
                         : "border-border bg-card text-muted-foreground hover:text-foreground"
-                      }`}
+                    }`}
                   >
                     {option.label}
                   </button>
@@ -275,10 +280,11 @@ export function SetupScreen({
                     onClick={() =>
                       updateField("brakes", option.id as BikeSetup["brakes"])
                     }
-                    className={`min-h-10 rounded-lg border text-xs font-medium transition-all ${setup.brakes === option.id
+                    className={`min-h-10 rounded-lg border text-xs font-medium transition-all ${
+                      setup.brakes === option.id
                         ? "border-glacier-blue bg-glacier-blue/20 text-foreground font-bold shadow-2xs"
                         : "border-border bg-card text-muted-foreground hover:text-foreground"
-                      }`}
+                    }`}
                   >
                     {option.label}
                   </button>
@@ -302,10 +308,11 @@ export function SetupScreen({
                     onClick={() =>
                       updateField("cooling", option.id as BikeSetup["cooling"])
                     }
-                    className={`min-h-10 rounded-lg border text-xs font-medium transition-all ${setup.cooling === option.id
+                    className={`min-h-10 rounded-lg border text-xs font-medium transition-all ${
+                      setup.cooling === option.id
                         ? "border-glacier-blue bg-glacier-blue/20 text-foreground font-bold shadow-2xs"
                         : "border-border bg-card text-muted-foreground hover:text-foreground"
-                      }`}
+                    }`}
                   >
                     {option.label}
                   </button>
@@ -329,10 +336,11 @@ export function SetupScreen({
                     onClick={() =>
                       updateField("start", option.id as BikeSetup["start"])
                     }
-                    className={`min-h-10 rounded-lg border text-xs font-medium transition-all ${setup.start === option.id
+                    className={`min-h-10 rounded-lg border text-xs font-medium transition-all ${
+                      setup.start === option.id
                         ? "border-glacier-blue bg-glacier-blue/20 text-foreground font-bold shadow-2xs"
                         : "border-border bg-card text-muted-foreground hover:text-foreground"
-                      }`}
+                    }`}
                   >
                     {option.label}
                   </button>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title:
-  "Free Bike PDI Checklist • Two-Wheeler Pre-Delivery Inspection Guide | tripmeter",
+    "Free Bike PDI Checklist • Two-Wheeler Pre-Delivery Inspection Guide | tripmeter",
   description:
     "Comprehensive, interactive pre-delivery inspection (PDI) checklist for new bikes and scooters. Check chassis VIN, engine numbers, tyres, paintwork, fluids, electronics and paperwork before signing delivery.",
   keywords: [
