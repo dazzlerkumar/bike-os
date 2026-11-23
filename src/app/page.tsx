@@ -11,6 +11,7 @@ import {
   Sparkles,
   Zap,
 } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -173,22 +174,24 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="border-border bg-card p-3 shadow-2xs">
-            <CardContent className="p-0 flex flex-col gap-1">
-              <div className="flex items-center justify-between text-muted-foreground text-[11px]">
-                <span>INSPECTION</span>
-                <FileCheck2 className="size-3.5 text-glacier-blue" />
-              </div>
-              <div className="flex items-baseline gap-1">
-                <span className="font-mono text-2xl font-extrabold text-foreground sm:text-3xl">
-                  {completedCount}/{checklist.length}
-                </span>
-              </div>
-              <p className="text-[10px] text-muted-foreground truncate">
-                Showroom PDI
-              </p>
-            </CardContent>
-          </Card>
+          <Link href="/pdi" className="block focus:outline-none">
+            <Card className="border-border bg-card p-3 shadow-2xs hover:border-glacier-blue/60 transition-colors">
+              <CardContent className="p-0 flex flex-col gap-1">
+                <div className="flex items-center justify-between text-muted-foreground text-[11px]">
+                  <span>INSPECTION</span>
+                  <FileCheck2 className="size-3.5 text-glacier-blue" />
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="font-mono text-2xl font-extrabold text-foreground sm:text-3xl">
+                    PDI Flow
+                  </span>
+                </div>
+                <p className="text-[10px] text-glacier-blue font-semibold truncate flex items-center gap-0.5">
+                  Launch Checklist &rarr;
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         </section>
 
         <section className="flex flex-col gap-2.5">
@@ -411,21 +414,16 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="min-h-11 border-border font-medium text-xs px-3"
-            >
-              Summary
-            </Button>
-            <Button
-              variant="default"
-              size="sm"
-              className="min-h-11 border border-border/80 shadow-xs font-semibold text-xs px-4"
-            >
-              Continue
-              <ChevronRight className="size-4" />
-            </Button>
+            <Link href="/pdi">
+              <Button
+                variant="default"
+                size="sm"
+                className="min-h-11 border border-border/80 shadow-xs font-semibold text-xs px-4"
+              >
+                PDI Flow
+                <ChevronRight className="size-4" />
+              </Button>
+            </Link>
           </div>
         </div>
       </footer>
