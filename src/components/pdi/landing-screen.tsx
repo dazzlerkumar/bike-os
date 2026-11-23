@@ -48,13 +48,13 @@ export function LandingScreen({
         <header className="flex justify-end">
           <span className="inline-flex items-center gap-2 font-bold tracking-tight text-foreground">
             <Image
-              src="/bikeos-primary.svg"
-              alt="bikeOS"
+              src="/tripmeter-primary.svg"
+              alt="tripmeter"
               width={20}
               height={20}
               className="size-5 rounded-md"
             />
-            bikeOS
+            tripmeter
           </span>
         </header>
 

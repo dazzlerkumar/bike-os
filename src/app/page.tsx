@@ -81,8 +81,8 @@ export default function Home() {
         <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3 sm:max-w-2xl sm:px-6">
           <div className="flex items-center gap-2.5">
             <Image
-              src="/bikeos-primary.svg"
-              alt="bikeOS"
+              src="/tripmeter-primary.svg"
+              alt="tripmeter"
               width={36}
               height={36}
               className="size-9 rounded-xl shadow-xs"
@@ -91,7 +91,7 @@ export default function Home() {
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-bold tracking-tight text-foreground text-sm">
-                  bikeOS
+                  tripmeter
                 </span>
                 <Badge
                   variant="outline"
@@ -229,11 +229,10 @@ export default function Home() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveZone(tab.id)}
-                className={`min-h-9 shrink-0 rounded-full px-3.5 text-xs font-medium transition-all ${
-                  activeZone === tab.id
+                className={`min-h-9 shrink-0 rounded-full px-3.5 text-xs font-medium transition-all ${activeZone === tab.id
                     ? "bg-foreground text-background shadow-xs"
                     : "bg-card border border-border text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>
@@ -249,13 +248,12 @@ export default function Home() {
               return (
                 <div
                   key={item.id}
-                  className={`flex flex-col gap-2 rounded-xl border p-3.5 transition-all shadow-2xs ${
-                    isIssue
+                  className={`flex flex-col gap-2 rounded-xl border p-3.5 transition-all shadow-2xs ${isIssue
                       ? "border-accent/40 bg-accent/[0.04]"
                       : isOk
                         ? "border-glacier-blue/60 bg-glacier-blue/[0.08]"
                         : "border-border bg-card"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex flex-col gap-0.5">
@@ -285,11 +283,10 @@ export default function Home() {
                       variant={isOk ? "default" : "outline"}
                       size="sm"
                       onClick={() => updateStatus(item.id, "ok")}
-                      className={`min-h-11 font-medium text-xs ${
-                        isOk
+                      className={`min-h-11 font-medium text-xs ${isOk
                           ? "bg-glacier-blue text-slate-950 border-glacier-blue shadow-xs font-bold"
                           : "border-border hover:bg-muted"
-                      }`}
+                        }`}
                     >
                       <CheckCircle2 className="size-4" />
                       OK
@@ -300,11 +297,10 @@ export default function Home() {
                       variant={isIssue ? "destructive" : "outline"}
                       size="sm"
                       onClick={() => updateStatus(item.id, "issue")}
-                      className={`min-h-11 font-medium text-xs ${
-                        isIssue
+                      className={`min-h-11 font-medium text-xs ${isIssue
                           ? "bg-accent text-accent-foreground shadow-xs font-bold"
                           : "border-border hover:bg-muted text-accent"
-                      }`}
+                        }`}
                     >
                       <AlertTriangle className="size-4" />
                       Issue
@@ -315,11 +311,10 @@ export default function Home() {
                       variant={isNa ? "secondary" : "outline"}
                       size="sm"
                       onClick={() => updateStatus(item.id, "na")}
-                      className={`min-h-11 font-medium text-xs ${
-                        isNa
+                      className={`min-h-11 font-medium text-xs ${isNa
                           ? "bg-muted text-foreground font-bold"
                           : "border-border hover:bg-muted text-muted-foreground"
-                      }`}
+                        }`}
                     >
                       <HelpCircle className="size-4" />
                       N/A

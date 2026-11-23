@@ -1,11 +1,13 @@
 import type { BikeSetup, InspectionRecord } from "./pdi-data";
 import { defaultBikeSetup } from "./pdi-data";
 
-const DB_NAME = "bikeos-pdi-db";
+const DB_NAME = "tripmeter-pdi-db";
 const DB_VERSION = 1;
 const STORE_INSPECTIONS = "inspections";
-const LOCAL_STORAGE_ACTIVE_KEY = "bikeos_pdi_active_id";
-const LOCAL_STORAGE_BACKUP_KEY = "bikeos_pdi_fallback_inspections";
+const LOCAL_STORAGE_ACTIVE_KEY = "tripmeter_pdi_active_id";
+const OLD_LOCAL_STORAGE_ACTIVE_KEY = "bikeos_pdi_active_id";
+const LOCAL_STORAGE_BACKUP_KEY = "tripmeter_pdi_fallback_inspections";
+const OLD_LOCAL_STORAGE_BACKUP_KEY = "bikeos_pdi_fallback_inspections";
 
 function isBrowser(): boolean {
   return typeof window !== "undefined" && typeof indexedDB !== "undefined";
@@ -34,7 +36,9 @@ function openDb(): Promise<IDBDatabase> {
 function getLocalStorageFallback(): Record<string, InspectionRecord> {
   if (typeof window === "undefined") return {};
   try {
-    const raw = window.localStorage.getItem(LOCAL_STORAGE_BACKUP_KEY);
+    const raw =
+      window.localStorage.getItem(LOCAL_STORAGE_BACKUP_KEY) ||
+      window.localStorage.getItem(OLD_LOCAL_STORAGE_BACKUP_KEY);
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
@@ -144,7 +148,10 @@ export async function deleteInspection(id: string): Promise<void> {
 
 export function getActiveInspectionId(): string | null {
   if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(LOCAL_STORAGE_ACTIVE_KEY);
+  return (
+    window.localStorage.getItem(LOCAL_STORAGE_ACTIVE_KEY) ||
+    window.localStorage.getItem(OLD_LOCAL_STORAGE_ACTIVE_KEY)
+  );
 }
 
 export function setActiveInspectionId(id: string): void {
@@ -155,6 +162,7 @@ export function setActiveInspectionId(id: string): void {
 export function clearActiveInspectionId(): void {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(LOCAL_STORAGE_ACTIVE_KEY);
+  window.localStorage.removeItem(OLD_LOCAL_STORAGE_ACTIVE_KEY);
 }
 
 export async function createNewInspection(

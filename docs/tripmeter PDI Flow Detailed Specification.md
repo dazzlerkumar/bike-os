@@ -1,8 +1,8 @@
-# bikeOS PDI Flow: Detailed Specification
+# tripmeter PDI Flow: Detailed Specification
 
 Version 0.1 · Draft · Author: Deepak
 
-This document describes the public pre-delivery inspection (PDI) experience end to end: who uses it, every screen and state from landing to a finished inspection, how items behave, what is saved, what happens on errors and interruptions, and how it connects to the bikeOS logbook.
+This document describes the public pre-delivery inspection (PDI) experience end to end: who uses it, every screen and state from landing to a finished inspection, how items behave, what is saved, what happens on errors and interruptions, and how it connects to the tripmeter logbook.
 
 ## 1. Purpose and scope
 
@@ -14,9 +14,9 @@ This document describes the public pre-delivery inspection (PDI) experience end 
 2. Produce evidence (notes, photos, a summary) the buyer can send to the dealer.
 3. Work for someone standing in a showroom, on a phone, with patchy signal and frequent interruptions.
 4. Be free and need no account, so it can be found and shared easily.
-5. Hand the starting readings of the bike to the bikeOS logbook, optionally.
+5. Hand the starting readings of the bike to the tripmeter logbook, optionally.
 
-**In scope (v1):** the public checklist flow, local saving, summary, copy and print outputs, and the optional handoff to bikeOS.
+**In scope (v1):** the public checklist flow, local saving, summary, copy and print outputs, and the optional handoff to tripmeter.
 
 **Out of scope (v1):** accounts, cloud sync, dealer-side tools, automated defect detection, legal advice, and model-specific official specifications.
 
@@ -43,12 +43,12 @@ The flow is designed for the showroom case first. The other contexts get optiona
 6. **Save everything instantly.** Interruptions are normal.
 7. **Overview and focus together.** One scrolling list, with only the current zone open.
 8. **Show gaps, not just results.** The summary highlights what was never checked.
-9. **Persuasion last.** Any mention of bikeOS comes after the user has finished and received value.
+9. **Persuasion last.** Any mention of tripmeter comes after the user has finished and received value.
 
 ## 4. Flow overview
 
 ```
-Landing → Bike setup (optional) → Prepare → Paperwork → Walk-around zones → Test ride → Summary → Outputs → After (bikeOS handoff)
+Landing → Bike setup (optional) → Prepare → Paperwork → Walk-around zones → Test ride → Summary → Outputs → After (tripmeter handoff)
 ```
 
 The user can jump between stages at any time. Only the summary is reached from anywhere via a persistent button.
@@ -293,7 +293,7 @@ Interruptions are the norm in a showroom.
 | **Copy issues for dealer** | Plain text list: date, bike, each issue with note and severity | Formatted to paste into WhatsApp or email; no photos |
 | **Save as PDF / Print** | Full report: summary, all zones with states and notes, photos | Uses the browser's print dialog with print-friendly styling |
 | **Share link** (later) | Read-only view of the report | Needs accounts or hosting; not in v1 |
-| **Download data** | JSON of the inspection | For import into the bikeOS logbook |
+| **Download data** | JSON of the inspection | For import into the tripmeter logbook |
 
 **Copy text template (example structure)**
 
@@ -307,7 +307,7 @@ Please confirm these will be resolved before delivery.
 
 The template stays neutral in tone; users can edit it before sending.
 
-### 5.11 After: the bikeOS handoff
+### 5.11 After: the tripmeter handoff
 
 **Goal:** Offer a useful next step without gating the PDI result.
 
@@ -537,7 +537,7 @@ The page should respect privacy: no personal data, no photos or notes ever sent.
 | Median time per zone | Finds slow or confusing zones |
 | Issue rate per item (aggregate) | Shows which checks matter most and improves content |
 | Summary views, copy actions, print actions | Confirms the output is useful |
-| Clicks on the bikeOS handoff card | Interest in the app, measured only after value is delivered |
+| Clicks on the tripmeter handoff card | Interest in the app, measured only after value is delivered |
 | Return visits to a saved inspection | Confirms interruptions are handled |
 
 ## 13. Test scenarios
@@ -560,7 +560,7 @@ The page should respect privacy: no personal data, no photos or notes ever sent.
 | **A: Done** | A simple single-list page with tick and flag, local saving, print and copy of issues |
 | **B: Core flow** | Walk-around zones, three-state rows, inline issue panel with note and photo, Next unchecked, and the summary screen |
 | **C: Tailoring** | Bike setup filtering, number-entry rows, severity chips, multiple inspections, Hindi |
-| **D: Handoff** | Data export, import into the bikeOS logbook, optional logbook card |
+| **D: Handoff** | Data export, import into the tripmeter logbook, optional logbook card |
 | **E: Later** | Accounts and sync, share link, model-specific templates, dealer-ready report formats |
 
 ## 15. Open questions
@@ -571,4 +571,4 @@ The page should respect privacy: no personal data, no photos or notes ever sent.
 4. Is cross-device resume important enough to bring accounts forward?
 5. What is the best sharing format for dealers: text, PDF, or a link?
 6. Which languages come after English and Hindi, if any?
-7. Should the page name or promote bikeOS at all before the logbook exists?
+7. Should the page name or promote tripmeter at all before the logbook exists?

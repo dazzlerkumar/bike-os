@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title:
-    "Free Bike PDI Checklist • Two-Wheeler Pre-Delivery Inspection Guide | bikeOS",
+  "Free Bike PDI Checklist • Two-Wheeler Pre-Delivery Inspection Guide | tripmeter",
   description:
     "Comprehensive, interactive pre-delivery inspection (PDI) checklist for new bikes and scooters. Check chassis VIN, engine numbers, tyres, paintwork, fluids, electronics and paperwork before signing delivery.",
   keywords: [
@@ -15,9 +15,9 @@ export const metadata: Metadata = {
     "showroom bike inspection checklist",
     "bike PDI before signing delivery note",
   ],
-  authors: [{ name: "bikeOS" }],
-  creator: "bikeOS",
-  publisher: "bikeOS",
+  authors: [{ name: "tripmeter" }],
+  creator: "tripmeter",
+  publisher: "tripmeter",
   robots: {
     index: true,
     follow: true,
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     description:
       "Stand by your new bike with confidence. Catch defects, paperwork mismatches, and fluid leaks at the showroom. Free, private, and works offline.",
     url: "/pdi",
-    siteName: "bikeOS",
+    siteName: "tripmeter",
     locale: "en_IN",
     type: "website",
   },

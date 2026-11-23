@@ -1,10 +1,10 @@
-# bikeOS: Product Requirements Document
+# tripmeter: Product Requirements Document
 
 Version 0.1 · Draft · Author: Deepak
 
 ## 1. Overview
 
-**bikeOS** is a personal operating system for a motorcycle owner. It brings everything a rider has to track about one bike into one fast, offline-capable app: the delivery inspection, fuel and mileage, service history and due dates, running costs, accessories, and documents.
+**tripmeter** is a personal operating system for a motorcycle owner. It brings everything a rider has to track about one bike into one fast, offline-capable app: the delivery inspection, fuel and mileage, service history and due dates, running costs, accessories, and documents.
 
 It starts as a tool built for one user (the author, who is buying a new bike). If it proves useful in daily life, it will be shared with friends and then opened to wider distribution if demand shows up.
 
