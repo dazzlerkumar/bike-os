@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface OdometerLoadingScreenProps {
@@ -31,40 +31,60 @@ const SPEED_TICKS = Array.from({ length: 21 }, (_, i) => {
   };
 });
 
+const TOTAL_ANIMATION_MS = 1950;
+const EXIT_TRANSITION_MS = 500;
+
 export function OdometerLoadingScreen({
   onComplete,
 }: OdometerLoadingScreenProps) {
   const [phase, setPhase] = useState<"igniting" | "exiting">("igniting");
   const [speed, setSpeed] = useState(0);
-
-  const handleSkip = useCallback(() => {
-    setPhase("exiting");
-    setTimeout(() => {
-      onComplete?.();
-    }, 200);
-  }, [onComplete]);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      onComplete?.();
-      return;
-    }
-
-    const startTime = performance.now();
     let frameId: number;
+    let exitTimeoutId: ReturnType<typeof setTimeout> | null = null;
+    let lastTimestamp: number | null = null;
+    let elapsed = 0;
+    let isFinished = false;
 
-    const animate = (now: number) => {
-      const elapsed = now - startTime;
+    const animate = (timestamp: number) => {
+      if (isFinished) return;
+
+      if (typeof document !== "undefined" && document.hidden) {
+        lastTimestamp = null;
+        frameId = requestAnimationFrame(animate);
+        return;
+      }
+
+      const now =
+        typeof timestamp === "number" &&
+        !Number.isNaN(timestamp) &&
+        timestamp > 0
+          ? timestamp
+          : performance.now();
+
+      if (lastTimestamp === null) {
+        lastTimestamp = now;
+      }
+
+      const delta = Math.min(now - lastTimestamp, 64);
+      lastTimestamp = now;
+      elapsed += delta;
 
       let currentSpeed = 0;
       if (elapsed < 750) {
-        const p = Math.min(1, elapsed / 750);
-        currentSpeed = 200 * (1 - (1 - p) ** 3);
+        const progress = Math.min(1, elapsed / 750);
+        currentSpeed = 200 * (1 - (1 - progress) ** 3);
       } else if (elapsed < 880) {
         currentSpeed = 200;
       } else if (elapsed < 1650) {
-        const p = Math.min(1, (elapsed - 880) / 770);
-        const eased = p < 0.5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2;
+        const progress = Math.min(1, (elapsed - 880) / 770);
+        const eased =
+          progress < 0.5
+            ? 2 * progress * progress
+            : 1 - (-2 * progress + 2) ** 2 / 2;
         currentSpeed = 200 * (1 - eased);
       } else {
         currentSpeed = 0;
@@ -72,13 +92,15 @@ export function OdometerLoadingScreen({
 
       setSpeed(currentSpeed);
 
-      if (elapsed < 1950) {
+      if (elapsed < TOTAL_ANIMATION_MS) {
         frameId = requestAnimationFrame(animate);
       } else {
+        isFinished = true;
+        setSpeed(0);
         setPhase("exiting");
-        setTimeout(() => {
-          onComplete?.();
-        }, 350);
+        exitTimeoutId = setTimeout(() => {
+          onCompleteRef.current?.();
+        }, EXIT_TRANSITION_MS);
       }
     };
 
@@ -86,17 +108,35 @@ export function OdometerLoadingScreen({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" || e.key === " ") {
-        handleSkip();
+        if (!isFinished) {
+          isFinished = true;
+          cancelAnimationFrame(frameId);
+          setPhase("exiting");
+          exitTimeoutId = setTimeout(() => {
+            onCompleteRef.current?.();
+          }, 200);
+        }
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        lastTimestamp = null;
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       cancelAnimationFrame(frameId);
+      if (exitTimeoutId) {
+        clearTimeout(exitTimeoutId);
+      }
       window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [onComplete, handleSkip]);
+  }, []);
 
   const needleAngle = -120 + (speed / 200) * 240;
 
@@ -108,13 +148,6 @@ export function OdometerLoadingScreen({
         phase === "exiting" ? "opacity-0 pointer-events-none" : "opacity-100",
       )}
     >
-      <button
-        type="button"
-        onClick={handleSkip}
-        aria-label="Skip boot sequence"
-        className="absolute inset-0 size-full cursor-pointer bg-transparent border-0 p-0 m-0 z-0"
-      />
-
       <div
         className="pointer-events-none absolute w-96 h-96 rounded-full bg-radial from-glacier-blue/30 via-glacier-blue/10 to-transparent blur-3xl opacity-75"
         aria-hidden="true"

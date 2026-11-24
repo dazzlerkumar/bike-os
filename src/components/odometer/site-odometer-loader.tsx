@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { OdometerLoadingScreen } from "./odometer-loading-screen";
 
 export function SiteOdometerLoader({
@@ -10,9 +10,9 @@ export function SiteOdometerLoader({
 }) {
   const [showLoader, setShowLoader] = useState(true);
 
-  const handleComplete = () => {
+  const handleComplete = useCallback(() => {
     setShowLoader(false);
-  };
+  }, []);
 
   return (
     <>
