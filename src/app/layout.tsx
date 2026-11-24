@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SiteOdometerLoader } from "@/components/odometer/site-odometer-loader";
 import "./globals.css";
-
+import { Analytics } from "@vercel/analytics/next"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -54,6 +54,7 @@ export default function RootLayout({
     >
       <body className="min-h-dvh flex flex-col">
         <SiteOdometerLoader>{children}</SiteOdometerLoader>
+        <Analytics />
       </body>
     </html>
   );
